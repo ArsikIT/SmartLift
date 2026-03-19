@@ -1,0 +1,76 @@
+### SmartLift API examples
+### Base URL
+@baseUrl = http://localhost:8080/api
+
+### Create lift
+POST {{baseUrl}}/lifts
+Content-Type: application/json
+
+{
+  "serialNumber": "SL-2026-0001",
+  "model": "OTIS-GEN2",
+  "manufacturer": "Otis",
+  "status": "CREATED",
+  "manufacturerOrganizationId": 1,
+  "serviceOrganizationId": 2,
+  "managementOrganizationId": 3
+}
+
+### Get all lifts
+GET {{baseUrl}}/lifts
+
+### Get lift by id
+GET {{baseUrl}}/lifts/1
+
+### Update lift
+PUT {{baseUrl}}/lifts/1
+Content-Type: application/json
+
+{
+  "serialNumber": "SL-2026-0001",
+  "model": "OTIS-GEN2-REV-B",
+  "manufacturer": "Otis",
+  "status": "ACTIVE",
+  "manufacturerOrganizationId": 1,
+  "serviceOrganizationId": 2,
+  "managementOrganizationId": 3
+}
+
+### Delete lift
+DELETE {{baseUrl}}/lifts/1
+
+### Create lift event
+POST {{baseUrl}}/events
+Content-Type: application/json
+
+{
+  "liftId": 1,
+  "type": "FAULT",
+  "eventAt": "2026-03-19T10:30:00",
+  "description": "Door sensor fault detected during morning inspection.",
+  "performedByUserId": 5
+}
+
+### Get all events
+GET {{baseUrl}}/events
+
+### Get events for one lift timeline
+GET {{baseUrl}}/events?liftId=1
+
+### Get event by id
+GET {{baseUrl}}/events/1
+
+### Update event
+PUT {{baseUrl}}/events/1
+Content-Type: application/json
+
+{
+  "liftId": 1,
+  "type": "REPAIR",
+  "eventAt": "2026-03-19T12:00:00",
+  "description": "Door sensor replaced and calibration completed.",
+  "performedByUserId": 5
+}
+
+### Delete event
+DELETE {{baseUrl}}/events/1
