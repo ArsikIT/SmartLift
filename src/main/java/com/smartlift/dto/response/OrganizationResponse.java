@@ -1,6 +1,6 @@
-package com.smartlift.dto;
+package com.smartlift.dto.response;
 
-import com.smartlift.model.OrganizationType;
+import com.smartlift.model.enums.OrganizationType;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;

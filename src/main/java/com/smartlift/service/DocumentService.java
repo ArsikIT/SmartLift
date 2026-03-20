@@ -1,7 +1,7 @@
 package com.smartlift.service;
 
-import com.smartlift.dto.DocumentRequest;
-import com.smartlift.dto.DocumentResponse;
+import com.smartlift.dto.request.DocumentRequest;
+import com.smartlift.dto.response.DocumentResponse;
 import java.util.List;
 
 public interface DocumentService {

@@ -1,7 +1,7 @@
 package com.smartlift.controller;
 
-import com.smartlift.dto.MaintenanceRequest;
-import com.smartlift.dto.MaintenanceResponse;
+import com.smartlift.dto.request.MaintenanceRequest;
+import com.smartlift.dto.response.MaintenanceResponse;
 import com.smartlift.service.MaintenanceService;
 import jakarta.validation.Valid;
 import java.net.URI;

@@ -1,13 +1,13 @@
 package com.smartlift.mapper;
 
-import com.smartlift.dto.DocumentResponse;
-import com.smartlift.dto.LiftEventResponse;
-import com.smartlift.dto.LiftResponse;
-import com.smartlift.dto.MaintenanceResponse;
-import com.smartlift.dto.OrganizationResponse;
-import com.smartlift.dto.OrganizationSummaryResponse;
-import com.smartlift.dto.UserResponse;
-import com.smartlift.dto.UserSummaryResponse;
+import com.smartlift.dto.response.DocumentResponse;
+import com.smartlift.dto.response.LiftEventResponse;
+import com.smartlift.dto.response.LiftResponse;
+import com.smartlift.dto.response.MaintenanceResponse;
+import com.smartlift.dto.response.OrganizationResponse;
+import com.smartlift.dto.response.OrganizationSummaryResponse;
+import com.smartlift.dto.response.UserResponse;
+import com.smartlift.dto.response.UserSummaryResponse;
 import com.smartlift.model.Document;
 import com.smartlift.model.Lift;
 import com.smartlift.model.LiftEvent;

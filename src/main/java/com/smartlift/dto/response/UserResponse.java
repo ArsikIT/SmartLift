@@ -1,4 +1,4 @@
-package com.smartlift.dto;
+package com.smartlift.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.Set;

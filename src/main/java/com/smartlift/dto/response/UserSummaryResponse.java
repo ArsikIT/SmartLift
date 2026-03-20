@@ -1,4 +1,4 @@
-package com.smartlift.dto;
+package com.smartlift.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

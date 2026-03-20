@@ -1,13 +1,13 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.MaintenanceRequest;
-import com.smartlift.dto.MaintenanceResponse;
+import com.smartlift.dto.request.MaintenanceRequest;
+import com.smartlift.dto.response.MaintenanceResponse;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Lift;
 import com.smartlift.model.Maintenance;
-import com.smartlift.model.MaintenanceStatus;
+import com.smartlift.model.enums.MaintenanceStatus;
 import com.smartlift.model.User;
 import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.MaintenanceRepository;

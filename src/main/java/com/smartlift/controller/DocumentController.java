@@ -1,7 +1,7 @@
 package com.smartlift.controller;
 
-import com.smartlift.dto.DocumentRequest;
-import com.smartlift.dto.DocumentResponse;
+import com.smartlift.dto.request.DocumentRequest;
+import com.smartlift.dto.response.DocumentResponse;
 import com.smartlift.service.DocumentService;
 import jakarta.validation.Valid;
 import java.net.URI;

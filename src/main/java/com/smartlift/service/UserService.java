@@ -1,7 +1,7 @@
 package com.smartlift.service;
 
-import com.smartlift.dto.UserRequest;
-import com.smartlift.dto.UserResponse;
+import com.smartlift.dto.request.UserRequest;
+import com.smartlift.dto.response.UserResponse;
 import java.util.List;
 
 public interface UserService {

@@ -1,9 +1,10 @@
-package com.smartlift.dto;
+package com.smartlift.dto.request;
 
-import com.smartlift.model.MaintenanceStatus;
+import com.smartlift.model.enums.LiftEventType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,19 +12,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MaintenanceRequest {
+public class LiftEventRequest {
 
     @NotNull
     private Long liftId;
 
-    @NotBlank
-    @Size(max = 255)
-    private String title;
+    @NotNull
+    private LiftEventType type;
 
-    @Size(max = 1000)
+    private LocalDateTime eventAt;
+
+    @NotBlank
+    @Size(max = 500)
     private String description;
 
-    private MaintenanceStatus status;
-    private Long assignedTechnicianId;
-    private Long requestedByUserId;
+    private Long performedByUserId;
 }

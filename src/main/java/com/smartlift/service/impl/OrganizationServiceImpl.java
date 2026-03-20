@@ -1,7 +1,7 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.OrganizationRequest;
-import com.smartlift.dto.OrganizationResponse;
+import com.smartlift.dto.request.OrganizationRequest;
+import com.smartlift.dto.response.OrganizationResponse;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;

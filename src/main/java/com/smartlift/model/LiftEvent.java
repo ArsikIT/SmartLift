@@ -1,5 +1,6 @@
 package com.smartlift.model;
 
+import com.smartlift.model.enums.LiftEventType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

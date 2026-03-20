@@ -1,4 +1,4 @@
-package com.smartlift.model;
+package com.smartlift.model.enums;
 
 public enum LiftStatus {
     CREATED,

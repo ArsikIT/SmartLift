@@ -1,7 +1,7 @@
 package com.smartlift.repository;
 
 import com.smartlift.model.Organization;
-import com.smartlift.model.OrganizationType;
+import com.smartlift.model.enums.OrganizationType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

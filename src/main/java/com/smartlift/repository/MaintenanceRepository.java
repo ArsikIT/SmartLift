@@ -1,7 +1,7 @@
 package com.smartlift.repository;
 
 import com.smartlift.model.Maintenance;
-import com.smartlift.model.MaintenanceStatus;
+import com.smartlift.model.enums.MaintenanceStatus;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

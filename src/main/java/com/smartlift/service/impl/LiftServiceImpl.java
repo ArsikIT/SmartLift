@@ -1,14 +1,14 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.LiftRequest;
-import com.smartlift.dto.LiftResponse;
+import com.smartlift.dto.request.LiftRequest;
+import com.smartlift.dto.response.LiftResponse;
 import com.smartlift.exception.BadRequestException;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Lift;
 import com.smartlift.model.Organization;
-import com.smartlift.model.OrganizationType;
+import com.smartlift.model.enums.OrganizationType;
 import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.LiftService;

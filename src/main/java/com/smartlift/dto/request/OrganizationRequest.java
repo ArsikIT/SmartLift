@@ -1,6 +1,6 @@
-package com.smartlift.dto;
+package com.smartlift.dto.request;
 
-import com.smartlift.model.OrganizationType;
+import com.smartlift.model.enums.OrganizationType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

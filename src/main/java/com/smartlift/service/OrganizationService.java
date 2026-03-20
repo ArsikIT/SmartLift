@@ -1,7 +1,7 @@
 package com.smartlift.service;
 
-import com.smartlift.dto.OrganizationRequest;
-import com.smartlift.dto.OrganizationResponse;
+import com.smartlift.dto.request.OrganizationRequest;
+import com.smartlift.dto.response.OrganizationResponse;
 import java.util.List;
 
 public interface OrganizationService {

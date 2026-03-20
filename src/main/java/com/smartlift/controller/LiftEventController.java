@@ -1,7 +1,7 @@
 package com.smartlift.controller;
 
-import com.smartlift.dto.LiftEventRequest;
-import com.smartlift.dto.LiftEventResponse;
+import com.smartlift.dto.request.LiftEventRequest;
+import com.smartlift.dto.response.LiftEventResponse;
 import jakarta.validation.Valid;
 import com.smartlift.service.LiftEventService;
 import java.net.URI;

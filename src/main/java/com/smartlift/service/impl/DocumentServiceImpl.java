@@ -1,7 +1,7 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.DocumentRequest;
-import com.smartlift.dto.DocumentResponse;
+import com.smartlift.dto.request.DocumentRequest;
+import com.smartlift.dto.response.DocumentResponse;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Document;

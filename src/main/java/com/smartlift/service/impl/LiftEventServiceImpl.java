@@ -1,14 +1,14 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.LiftEventRequest;
-import com.smartlift.dto.LiftEventResponse;
+import com.smartlift.dto.request.LiftEventRequest;
+import com.smartlift.dto.response.LiftEventResponse;
 import com.smartlift.exception.BadRequestException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Lift;
 import com.smartlift.model.LiftEvent;
-import com.smartlift.model.LiftEventType;
-import com.smartlift.model.LiftStatus;
+import com.smartlift.model.enums.LiftEventType;
+import com.smartlift.model.enums.LiftStatus;
 import com.smartlift.model.User;
 import com.smartlift.repository.LiftEventRepository;
 import com.smartlift.repository.LiftRepository;

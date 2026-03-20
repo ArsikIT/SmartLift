@@ -1,13 +1,13 @@
 package com.smartlift.service.impl;
 
-import com.smartlift.dto.UserRequest;
-import com.smartlift.dto.UserResponse;
+import com.smartlift.dto.request.UserRequest;
+import com.smartlift.dto.response.UserResponse;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Organization;
 import com.smartlift.model.Role;
-import com.smartlift.model.RoleName;
+import com.smartlift.model.enums.RoleName;
 import com.smartlift.model.User;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.repository.RoleRepository;

@@ -1,7 +1,7 @@
 package com.smartlift.repository;
 
 import com.smartlift.model.Role;
-import com.smartlift.model.RoleName;
+import com.smartlift.model.enums.RoleName;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

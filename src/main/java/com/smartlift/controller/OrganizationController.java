@@ -1,7 +1,7 @@
 package com.smartlift.controller;
 
-import com.smartlift.dto.OrganizationRequest;
-import com.smartlift.dto.OrganizationResponse;
+import com.smartlift.dto.request.OrganizationRequest;
+import com.smartlift.dto.response.OrganizationResponse;
 import com.smartlift.service.OrganizationService;
 import jakarta.validation.Valid;
 import java.net.URI;

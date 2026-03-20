@@ -1,7 +1,7 @@
 package com.smartlift.repository;
 
 import com.smartlift.model.LiftEvent;
-import com.smartlift.model.LiftEventType;
+import com.smartlift.model.enums.LiftEventType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
