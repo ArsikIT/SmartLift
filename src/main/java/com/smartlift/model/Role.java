@@ -1,7 +1,6 @@
 package com.smartlift.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.smartlift.model.enums.RoleName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "roles")
 public class Role extends BaseEntity {
 
@@ -26,7 +24,6 @@ public class Role extends BaseEntity {
     @Column(nullable = false, unique = true, length = 50)
     private RoleName name;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
 }

@@ -1,13 +1,22 @@
 package com.smartlift.mapper;
 
-import com.smartlift.dto.LiftEventResponse;
-import com.smartlift.dto.LiftResponse;
-import com.smartlift.dto.OrganizationSummaryResponse;
-import com.smartlift.dto.UserSummaryResponse;
+import com.smartlift.dto.response.DocumentResponse;
+import com.smartlift.dto.response.LiftEventResponse;
+import com.smartlift.dto.response.LiftResponse;
+import com.smartlift.dto.response.MaintenanceResponse;
+import com.smartlift.dto.response.OrganizationResponse;
+import com.smartlift.dto.response.OrganizationSummaryResponse;
+import com.smartlift.dto.response.UserResponse;
+import com.smartlift.dto.response.UserSummaryResponse;
+import com.smartlift.model.Document;
 import com.smartlift.model.Lift;
 import com.smartlift.model.LiftEvent;
+import com.smartlift.model.Maintenance;
 import com.smartlift.model.Organization;
+import com.smartlift.model.Role;
 import com.smartlift.model.User;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class SmartLiftMapper {
 
@@ -40,6 +49,69 @@ public final class SmartLiftMapper {
                 .performedBy(toUserSummary(event.getPerformedBy()))
                 .createdAt(event.getCreatedAt())
                 .updatedAt(event.getUpdatedAt())
+                .build();
+    }
+
+    public static OrganizationResponse toOrganizationResponse(Organization org) {
+        return OrganizationResponse.builder()
+                .id(org.getId())
+                .name(org.getName())
+                .type(org.getType())
+                .address(org.getAddress())
+                .contactEmail(org.getContactEmail())
+                .contactPhone(org.getContactPhone())
+                .createdAt(org.getCreatedAt())
+                .updatedAt(org.getUpdatedAt())
+                .build();
+    }
+
+    public static UserResponse toUserResponse(User user) {
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .enabled(user.isEnabled())
+                .organization(toOrganizationSummary(user.getOrganization()))
+                .roles(roleNames)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+
+    public static MaintenanceResponse toMaintenanceResponse(Maintenance m) {
+        return MaintenanceResponse.builder()
+                .id(m.getId())
+                .liftId(m.getLift().getId())
+                .liftSerialNumber(m.getLift().getSerialNumber())
+                .title(m.getTitle())
+                .description(m.getDescription())
+                .status(m.getStatus())
+                .assignedTechnician(toUserSummary(m.getAssignedTechnician()))
+                .requestedBy(toUserSummary(m.getRequestedBy()))
+                .requestedAt(m.getRequestedAt())
+                .startedAt(m.getStartedAt())
+                .completedAt(m.getCompletedAt())
+                .createdAt(m.getCreatedAt())
+                .updatedAt(m.getUpdatedAt())
+                .build();
+    }
+
+    public static DocumentResponse toDocumentResponse(Document doc) {
+        return DocumentResponse.builder()
+                .id(doc.getId())
+                .fileName(doc.getFileName())
+                .filePath(doc.getFilePath())
+                .contentType(doc.getContentType())
+                .liftId(doc.getLift() != null ? doc.getLift().getId() : null)
+                .maintenanceId(doc.getMaintenance() != null ? doc.getMaintenance().getId() : null)
+                .uploadedBy(toUserSummary(doc.getUploadedBy()))
+                .createdAt(doc.getCreatedAt())
+                .updatedAt(doc.getUpdatedAt())
                 .build();
     }
 

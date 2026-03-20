@@ -1,6 +1,6 @@
-package com.smartlift.dto;
+package com.smartlift.dto.request;
 
-import com.smartlift.model.LiftStatus;
+import com.smartlift.model.enums.LiftStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

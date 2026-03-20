@@ -1,6 +1,6 @@
-package com.smartlift.dto;
+package com.smartlift.dto.request;
 
-import com.smartlift.model.LiftEventType;
+import com.smartlift.model.enums.LiftEventType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

@@ -1,7 +1,7 @@
 package com.smartlift.service;
 
-import com.smartlift.dto.LiftEventRequest;
-import com.smartlift.dto.LiftEventResponse;
+import com.smartlift.dto.request.LiftEventRequest;
+import com.smartlift.dto.response.LiftEventResponse;
 import java.util.List;
 
 public interface LiftEventService {

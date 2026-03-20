@@ -1,6 +1,6 @@
 package com.smartlift.exception;
 
-import com.smartlift.dto.ApiErrorResponse;
+import com.smartlift.dto.response.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import org.springframework.dao.DataIntegrityViolationException;
