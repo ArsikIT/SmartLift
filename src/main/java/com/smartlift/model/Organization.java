@@ -1,7 +1,5 @@
 package com.smartlift.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +16,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "organizations")
 public class Organization extends BaseEntity {
 
@@ -38,19 +35,15 @@ public class Organization extends BaseEntity {
     @Column(length = 50)
     private String contactPhone;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "organization")
     private Set<User> users = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "manufacturerOrganization")
     private Set<Lift> manufacturedLifts = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "serviceOrganization")
     private Set<Lift> servicedLifts = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "managementOrganization")
     private Set<Lift> managedLifts = new HashSet<>();
 }

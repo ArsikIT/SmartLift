@@ -1,7 +1,5 @@
 package com.smartlift.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,7 +19,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "users")
 public class User extends BaseEntity {
 
@@ -31,7 +28,6 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -50,19 +46,15 @@ public class User extends BaseEntity {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "performedBy")
     private Set<LiftEvent> performedEvents = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "assignedTechnician")
     private Set<Maintenance> assignedMaintenances = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "requestedBy")
     private Set<Maintenance> requestedMaintenances = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "uploadedBy")
     private Set<Document> uploadedDocuments = new HashSet<>();
 }

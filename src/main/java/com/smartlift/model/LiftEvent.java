@@ -1,6 +1,5 @@
 package com.smartlift.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "lift_events")
 public class LiftEvent extends BaseEntity {
 
