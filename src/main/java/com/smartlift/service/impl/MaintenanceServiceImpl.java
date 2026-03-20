@@ -14,9 +14,10 @@ import com.smartlift.repository.MaintenanceRepository;
 import com.smartlift.repository.UserRepository;
 import com.smartlift.service.MaintenanceService;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,19 +32,17 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MaintenanceResponse> getAllMaintenances() {
-        return maintenanceRepository.findAll().stream()
-                .map(SmartLiftMapper::toMaintenanceResponse)
-                .toList();
+    public Page<MaintenanceResponse> getAllMaintenances(Pageable pageable) {
+        return maintenanceRepository.findAll(pageable)
+                .map(SmartLiftMapper::toMaintenanceResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<MaintenanceResponse> getMaintenancesByLiftId(Long liftId) {
+    public Page<MaintenanceResponse> getMaintenancesByLiftId(Long liftId, Pageable pageable) {
         ensureLiftExists(liftId);
-        return maintenanceRepository.findAllByLiftId(liftId).stream()
-                .map(SmartLiftMapper::toMaintenanceResponse)
-                .toList();
+        return maintenanceRepository.findAllByLiftId(liftId, pageable)
+                .map(SmartLiftMapper::toMaintenanceResponse);
     }
 
     @Override

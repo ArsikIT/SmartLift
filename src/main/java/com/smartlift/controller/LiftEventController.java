@@ -5,8 +5,11 @@ import com.smartlift.dto.response.LiftEventResponse;
 import jakarta.validation.Valid;
 import com.smartlift.service.LiftEventService;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,11 +29,14 @@ public class LiftEventController {
     private final LiftEventService liftEventService;
 
     @GetMapping
-    public ResponseEntity<List<LiftEventResponse>> getEvents(@RequestParam(required = false) Long liftId) {
+    public ResponseEntity<Page<LiftEventResponse>> getEvents(
+            @RequestParam(required = false) Long liftId,
+            @PageableDefault(size = 20, sort = "eventAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         if (liftId != null) {
-            return ResponseEntity.ok(liftEventService.getEventsByLiftId(liftId));
+            return ResponseEntity.ok(liftEventService.getEventsByLiftId(liftId, pageable));
         }
-        return ResponseEntity.ok(liftEventService.getAllEvents());
+        return ResponseEntity.ok(liftEventService.getAllEvents(pageable));
     }
 
     @GetMapping("/{id}")

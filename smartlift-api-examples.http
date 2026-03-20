@@ -19,6 +19,9 @@ Content-Type: application/json
 ### Get all lifts
 GET {{baseUrl}}/lifts
 
+### Get lifts page 2 with custom size and sort
+GET {{baseUrl}}/lifts?page=1&size=10&sort=createdAt,desc
+
 ### Get lift by id
 GET {{baseUrl}}/lifts/1
 
@@ -54,8 +57,11 @@ Content-Type: application/json
 ### Get all events
 GET {{baseUrl}}/events
 
+### Get events page with custom sort
+GET {{baseUrl}}/events?page=0&size=5&sort=eventAt,desc
+
 ### Get events for one lift timeline
-GET {{baseUrl}}/events?liftId=1
+GET {{baseUrl}}/events?liftId=1&page=0&size=10&sort=eventAt,desc
 
 ### Get event by id
 GET {{baseUrl}}/events/1

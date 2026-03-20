@@ -1,12 +1,13 @@
 package com.smartlift.repository;
 
 import com.smartlift.model.Document;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-    List<Document> findAllByLiftId(Long liftId);
+    Page<Document> findAllByLiftId(Long liftId, Pageable pageable);
 
-    List<Document> findAllByMaintenanceId(Long maintenanceId);
+    Page<Document> findAllByMaintenanceId(Long maintenanceId, Pageable pageable);
 }

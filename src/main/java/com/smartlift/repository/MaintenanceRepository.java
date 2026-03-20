@@ -2,14 +2,15 @@ package com.smartlift.repository;
 
 import com.smartlift.model.Maintenance;
 import com.smartlift.model.enums.MaintenanceStatus;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> {
 
-    List<Maintenance> findAllByLiftId(Long liftId);
+    Page<Maintenance> findAllByLiftId(Long liftId, Pageable pageable);
 
-    List<Maintenance> findAllByAssignedTechnicianId(Long technicianId);
+    Page<Maintenance> findAllByAssignedTechnicianId(Long technicianId, Pageable pageable);
 
-    List<Maintenance> findAllByStatus(MaintenanceStatus status);
+    Page<Maintenance> findAllByStatus(MaintenanceStatus status, Pageable pageable);
 }

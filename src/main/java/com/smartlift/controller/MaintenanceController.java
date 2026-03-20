@@ -5,8 +5,11 @@ import com.smartlift.dto.response.MaintenanceResponse;
 import com.smartlift.service.MaintenanceService;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,13 +29,14 @@ public class MaintenanceController {
     private final MaintenanceService maintenanceService;
 
     @GetMapping
-    public ResponseEntity<List<MaintenanceResponse>> getMaintenances(
-            @RequestParam(required = false) Long liftId
+    public ResponseEntity<Page<MaintenanceResponse>> getMaintenances(
+            @RequestParam(required = false) Long liftId,
+            @PageableDefault(size = 20, sort = "requestedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         if (liftId != null) {
-            return ResponseEntity.ok(maintenanceService.getMaintenancesByLiftId(liftId));
+            return ResponseEntity.ok(maintenanceService.getMaintenancesByLiftId(liftId, pageable));
         }
-        return ResponseEntity.ok(maintenanceService.getAllMaintenances());
+        return ResponseEntity.ok(maintenanceService.getAllMaintenances(pageable));
     }
 
     @GetMapping("/{id}")

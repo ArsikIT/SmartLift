@@ -2,13 +2,14 @@ package com.smartlift.service;
 
 import com.smartlift.dto.request.MaintenanceRequest;
 import com.smartlift.dto.response.MaintenanceResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface MaintenanceService {
 
-    List<MaintenanceResponse> getAllMaintenances();
+    Page<MaintenanceResponse> getAllMaintenances(Pageable pageable);
 
-    List<MaintenanceResponse> getMaintenancesByLiftId(Long liftId);
+    Page<MaintenanceResponse> getMaintenancesByLiftId(Long liftId, Pageable pageable);
 
     MaintenanceResponse getMaintenanceById(Long id);
 

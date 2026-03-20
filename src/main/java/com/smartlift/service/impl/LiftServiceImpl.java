@@ -12,9 +12,10 @@ import com.smartlift.model.enums.OrganizationType;
 import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.LiftService;
-import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,9 @@ public class LiftServiceImpl implements LiftService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LiftResponse> getAllLifts() {
-        return liftRepository.findAll().stream()
-                .map(SmartLiftMapper::toLiftResponse)
-                .toList();
+    public Page<LiftResponse> getAllLifts(Pageable pageable) {
+        return liftRepository.findAll(pageable)
+                .map(SmartLiftMapper::toLiftResponse);
     }
 
     @Override

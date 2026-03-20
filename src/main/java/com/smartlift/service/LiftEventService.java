@@ -2,13 +2,14 @@ package com.smartlift.service;
 
 import com.smartlift.dto.request.LiftEventRequest;
 import com.smartlift.dto.response.LiftEventResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LiftEventService {
 
-    List<LiftEventResponse> getAllEvents();
+    Page<LiftEventResponse> getAllEvents(Pageable pageable);
 
-    List<LiftEventResponse> getEventsByLiftId(Long liftId);
+    Page<LiftEventResponse> getEventsByLiftId(Long liftId, Pageable pageable);
 
     LiftEventResponse getEventById(Long id);
 

@@ -4,10 +4,10 @@ services:
     container_name: smartlift-db
     environment:
       POSTGRES_DB: smartlift
-      POSTGRES_USER: smartlift
-      POSTGRES_PASSWORD: smartlift
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0000
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - smartlift-data:/var/lib/postgresql/data
 
