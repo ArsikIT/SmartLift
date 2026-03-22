@@ -28,86 +28,107 @@ public class DocumentServiceImpl implements DocumentService {
     private final LiftRepository liftRepository;
     private final MaintenanceRepository maintenanceRepository;
     private final UserRepository userRepository;
+    private final SecurityContextHelper securityHelper;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<DocumentResponse> getAllDocuments(Pageable pageable) {
-        return documentRepository.findAll(pageable)
+    public Page<DocumentResponse> getAllDocuments(String currentUsername, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        return documentRepository.findAllByOrganizationId(user.getOrganization().getId(), pageable)
                 .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<DocumentResponse> getDocumentsByLiftId(Long liftId, Pageable pageable) {
-        if (!liftRepository.existsById(liftId)) {
-            throw new ResourceNotFoundException("Lift not found: " + liftId);
-        }
+    public Page<DocumentResponse> getDocumentsByLiftId(String currentUsername, Long liftId, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Lift lift = liftRepository.findById(liftId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lift not found: " + liftId));
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
         return documentRepository.findAllByLiftId(liftId, pageable)
                 .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId, Pageable pageable) {
-        if (!maintenanceRepository.existsById(maintenanceId)) {
-            throw new ResourceNotFoundException("Maintenance not found: " + maintenanceId);
-        }
+    public Page<DocumentResponse> getDocumentsByMaintenanceId(String currentUsername, Long maintenanceId, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Maintenance not found: " + maintenanceId));
+        securityHelper.checkLiftBelongsToOrg(maintenance.getLift(), user.getOrganization().getId());
         return documentRepository.findAllByMaintenanceId(maintenanceId, pageable)
                 .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DocumentResponse getDocumentById(Long id) {
-        return SmartLiftMapper.toDocumentResponse(getOrThrow(id));
+    public DocumentResponse getDocumentById(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Document doc = getOrThrow(id);
+        checkDocumentAccess(doc, user.getOrganization().getId());
+        return SmartLiftMapper.toDocumentResponse(doc);
     }
 
     @Override
-    public DocumentResponse createDocument(DocumentRequest request) {
+    public DocumentResponse createDocument(String currentUsername, DocumentRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
         Document doc = new Document();
-        applyRequest(doc, request);
+        applyRequest(doc, request, user.getOrganization().getId());
         Document saved = documentRepository.saveAndFlush(doc);
         return SmartLiftMapper.toDocumentResponse(saved);
     }
 
     @Override
-    public DocumentResponse updateDocument(Long id, DocumentRequest request) {
+    public DocumentResponse updateDocument(String currentUsername, Long id, DocumentRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
         Document doc = getOrThrow(id);
-        applyRequest(doc, request);
+        checkDocumentAccess(doc, user.getOrganization().getId());
+        applyRequest(doc, request, user.getOrganization().getId());
         Document saved = documentRepository.saveAndFlush(doc);
         return SmartLiftMapper.toDocumentResponse(saved);
     }
 
     @Override
-    public void deleteDocument(Long id) {
+    public void deleteDocument(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
         Document doc = getOrThrow(id);
+        checkDocumentAccess(doc, user.getOrganization().getId());
         documentRepository.delete(doc);
         documentRepository.flush();
     }
 
-    private void applyRequest(Document doc, DocumentRequest request) {
+    private void applyRequest(Document doc, DocumentRequest request, Long orgId) {
         doc.setFileName(request.getFileName().trim());
         doc.setFilePath(request.getFilePath().trim());
         doc.setContentType(request.getContentType());
-        doc.setLift(resolveLift(request.getLiftId()));
-        doc.setMaintenance(resolveMaintenance(request.getMaintenanceId()));
+
+        if (request.getLiftId() != null) {
+            Lift lift = liftRepository.findById(request.getLiftId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Lift not found: " + request.getLiftId()));
+            securityHelper.checkLiftBelongsToOrg(lift, orgId);
+            doc.setLift(lift);
+        } else {
+            doc.setLift(null);
+        }
+
+        if (request.getMaintenanceId() != null) {
+            Maintenance maintenance = maintenanceRepository.findById(request.getMaintenanceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Maintenance not found: " + request.getMaintenanceId()));
+            securityHelper.checkLiftBelongsToOrg(maintenance.getLift(), orgId);
+            doc.setMaintenance(maintenance);
+        } else {
+            doc.setMaintenance(null);
+        }
+
         doc.setUploadedBy(resolveUser(request.getUploadedByUserId()));
     }
 
-    private Lift resolveLift(Long liftId) {
-        if (liftId == null) {
-            return null;
+    private void checkDocumentAccess(Document doc, Long orgId) {
+        if (doc.getLift() != null) {
+            securityHelper.checkLiftBelongsToOrg(doc.getLift(), orgId);
+        } else if (doc.getMaintenance() != null) {
+            securityHelper.checkLiftBelongsToOrg(doc.getMaintenance().getLift(), orgId);
         }
-        return liftRepository.findById(liftId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lift not found: " + liftId));
-    }
-
-    private Maintenance resolveMaintenance(Long maintenanceId) {
-        if (maintenanceId == null) {
-            return null;
-        }
-        return maintenanceRepository.findById(maintenanceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Maintenance not found: " + maintenanceId));
     }
 
     private User resolveUser(Long userId) {

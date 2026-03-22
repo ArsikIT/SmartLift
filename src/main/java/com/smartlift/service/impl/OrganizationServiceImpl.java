@@ -3,15 +3,12 @@ package com.smartlift.service.impl;
 import com.smartlift.dto.request.OrganizationRequest;
 import com.smartlift.dto.response.OrganizationResponse;
 import com.smartlift.exception.ConflictException;
-import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Organization;
+import com.smartlift.model.User;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,52 +18,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
+    private final SecurityContextHelper securityHelper;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrganizationResponse> getAllOrganizations(Pageable pageable) {
-        return organizationRepository.findAll(pageable)
-                .map(SmartLiftMapper::toOrganizationResponse);
+    public OrganizationResponse getMyOrganization(String currentUsername) {
+        User user = securityHelper.resolveUser(currentUsername);
+        return SmartLiftMapper.toOrganizationResponse(user.getOrganization());
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public OrganizationResponse getOrganizationById(Long id) {
-        return SmartLiftMapper.toOrganizationResponse(getOrThrow(id));
-    }
+    public OrganizationResponse updateMyOrganization(String currentUsername, OrganizationRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Organization org = user.getOrganization();
 
-    @Override
-    public OrganizationResponse createOrganization(OrganizationRequest request) {
-        Organization org = new Organization();
-        applyRequest(org, request);
-        return saveAndMap(org);
-    }
-
-    @Override
-    public OrganizationResponse updateOrganization(Long id, OrganizationRequest request) {
-        Organization org = getOrThrow(id);
-        applyRequest(org, request);
-        return saveAndMap(org);
-    }
-
-    @Override
-    public void deleteOrganization(Long id) {
-        Organization org = getOrThrow(id);
-        try {
-            organizationRepository.delete(org);
-            organizationRepository.flush();
-        } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("Organization cannot be deleted while referenced by users or lifts");
-        }
-    }
-
-    private void applyRequest(Organization org, OrganizationRequest request) {
         validateUniqueName(request.getName(), org.getId());
         org.setName(request.getName().trim());
-        org.setType(request.getType());
         org.setAddress(request.getAddress());
         org.setContactEmail(request.getContactEmail());
         org.setContactPhone(request.getContactPhone());
+
+        Organization saved = organizationRepository.saveAndFlush(org);
+        return SmartLiftMapper.toOrganizationResponse(saved);
     }
 
     private void validateUniqueName(String name, Long currentId) {
@@ -75,19 +48,5 @@ public class OrganizationServiceImpl implements OrganizationService {
                 throw new ConflictException("Organization name already exists: " + name);
             }
         });
-    }
-
-    private OrganizationResponse saveAndMap(Organization org) {
-        try {
-            Organization saved = organizationRepository.saveAndFlush(org);
-            return SmartLiftMapper.toOrganizationResponse(saved);
-        } catch (DataIntegrityViolationException e) {
-            throw new ConflictException("Organization name already exists");
-        }
-    }
-
-    private Organization getOrThrow(Long id) {
-        return organizationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + id));
     }
 }

@@ -5,12 +5,14 @@ import com.smartlift.dto.response.UserResponse;
 import com.smartlift.service.UserService;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,39 +25,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
-
     private final UserService userService;
 
     @GetMapping
     public ResponseEntity<Page<UserResponse>> getAllUsers(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(userService.getAllUsers(pageable));
+            Principal principal,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(principal.getName(), pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserResponse> getUserById(Principal principal, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(principal.getName(), id));
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
-        UserResponse created = userService.createUser(request);
+    public ResponseEntity<UserResponse> createUser(Principal principal, @Valid @RequestBody UserRequest request) {
+        UserResponse created = userService.createUser(principal.getName(), request);
         return ResponseEntity.created(URI.create("/api/users/" + created.getId())).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody UserRequest request
-    ) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    public ResponseEntity<UserResponse> updateUser(Principal principal, @PathVariable Long id, @Valid @RequestBody UserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(principal.getName(), id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(Principal principal, @PathVariable Long id) {
+        userService.deleteUser(principal.getName(), id);
         return ResponseEntity.noContent().build();
     }
 }

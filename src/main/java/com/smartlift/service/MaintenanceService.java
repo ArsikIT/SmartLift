@@ -7,15 +7,15 @@ import org.springframework.data.domain.Pageable;
 
 public interface MaintenanceService {
 
-    Page<MaintenanceResponse> getAllMaintenances(Pageable pageable);
+    Page<MaintenanceResponse> getAllMaintenances(String currentUsername, Pageable pageable);
 
-    Page<MaintenanceResponse> getMaintenancesByLiftId(Long liftId, Pageable pageable);
+    Page<MaintenanceResponse> getMaintenancesByLiftId(String currentUsername, Long liftId, Pageable pageable);
 
-    MaintenanceResponse getMaintenanceById(Long id);
+    MaintenanceResponse getMaintenanceById(String currentUsername, Long id);
 
-    MaintenanceResponse createMaintenance(MaintenanceRequest request);
+    MaintenanceResponse createMaintenance(String currentUsername, MaintenanceRequest request);
 
-    MaintenanceResponse updateMaintenance(Long id, MaintenanceRequest request);
+    MaintenanceResponse updateMaintenance(String currentUsername, Long id, MaintenanceRequest request);
 
-    void deleteMaintenance(Long id);
+    void deleteMaintenance(String currentUsername, Long id);
 }

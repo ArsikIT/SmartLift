@@ -36,6 +36,18 @@ public interface LiftRepository extends JpaRepository<Lift, Long> {
             left join fetch l.manufacturerOrganization
             left join fetch l.serviceOrganization
             left join fetch l.managementOrganization
+            where l.manufacturerOrganization.id = :orgId
+               or l.serviceOrganization.id = :orgId
+               or l.managementOrganization.id = :orgId
+            """)
+    Page<Lift> findAllByOrganizationId(Long orgId, Pageable pageable);
+
+    @Query("""
+            select l
+            from Lift l
+            left join fetch l.manufacturerOrganization
+            left join fetch l.serviceOrganization
+            left join fetch l.managementOrganization
             where l.id = :id
             """)
     Optional<Lift> findDetailedById(Long id);

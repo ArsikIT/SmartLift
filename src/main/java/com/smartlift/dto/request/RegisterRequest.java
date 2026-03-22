@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRequest {
+public class RegisterRequest {
 
     @NotBlank
     @Size(max = 100)
@@ -25,5 +25,10 @@ public class UserRequest {
     @Size(min = 8, max = 255)
     private String password;
 
-    private Boolean enabled;
+    @NotBlank
+    @Size(max = 150)
+    private String organizationName;
+
+    @NotBlank
+    private String organizationType;
 }
