@@ -7,15 +7,15 @@ import org.springframework.data.domain.Pageable;
 
 public interface LiftEventService {
 
-    Page<LiftEventResponse> getAllEvents(Pageable pageable);
+    Page<LiftEventResponse> getAllEvents(String currentUsername, Pageable pageable);
 
-    Page<LiftEventResponse> getEventsByLiftId(Long liftId, Pageable pageable);
+    Page<LiftEventResponse> getEventsByLiftId(String currentUsername, Long liftId, Pageable pageable);
 
-    LiftEventResponse getEventById(Long id);
+    LiftEventResponse getEventById(String currentUsername, Long id);
 
-    LiftEventResponse createEvent(LiftEventRequest request);
+    LiftEventResponse createEvent(String currentUsername, LiftEventRequest request);
 
-    LiftEventResponse updateEvent(Long id, LiftEventRequest request);
+    LiftEventResponse updateEvent(String currentUsername, Long id, LiftEventRequest request);
 
-    void deleteEvent(Long id);
+    void deleteEvent(String currentUsername, Long id);
 }

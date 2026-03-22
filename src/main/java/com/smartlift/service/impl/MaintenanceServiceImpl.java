@@ -7,8 +7,8 @@ import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Lift;
 import com.smartlift.model.Maintenance;
-import com.smartlift.model.enums.MaintenanceStatus;
 import com.smartlift.model.User;
+import com.smartlift.model.enums.MaintenanceStatus;
 import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.MaintenanceRepository;
 import com.smartlift.repository.UserRepository;
@@ -29,48 +29,67 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     private final MaintenanceRepository maintenanceRepository;
     private final LiftRepository liftRepository;
     private final UserRepository userRepository;
+    private final SecurityContextHelper securityHelper;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MaintenanceResponse> getAllMaintenances(Pageable pageable) {
-        return maintenanceRepository.findAll(pageable)
+    public Page<MaintenanceResponse> getAllMaintenances(String currentUsername, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        return maintenanceRepository.findAllByOrganizationId(user.getOrganization().getId(), pageable)
                 .map(SmartLiftMapper::toMaintenanceResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MaintenanceResponse> getMaintenancesByLiftId(Long liftId, Pageable pageable) {
-        ensureLiftExists(liftId);
+    public Page<MaintenanceResponse> getMaintenancesByLiftId(String currentUsername, Long liftId, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Lift lift = getLiftOrThrow(liftId);
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
         return maintenanceRepository.findAllByLiftId(liftId, pageable)
                 .map(SmartLiftMapper::toMaintenanceResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MaintenanceResponse getMaintenanceById(Long id) {
-        return SmartLiftMapper.toMaintenanceResponse(getOrThrow(id));
+    public MaintenanceResponse getMaintenanceById(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Maintenance maintenance = getOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(maintenance.getLift(), user.getOrganization().getId());
+        return SmartLiftMapper.toMaintenanceResponse(maintenance);
     }
 
     @Override
-    public MaintenanceResponse createMaintenance(MaintenanceRequest request) {
+    public MaintenanceResponse createMaintenance(String currentUsername, MaintenanceRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Lift lift = getLiftOrThrow(request.getLiftId());
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
+
         Maintenance maintenance = new Maintenance();
         maintenance.setRequestedAt(LocalDateTime.now());
-        applyRequest(maintenance, request);
+        applyRequest(maintenance, request, lift);
         return saveAndMap(maintenance);
     }
 
     @Override
-    public MaintenanceResponse updateMaintenance(Long id, MaintenanceRequest request) {
+    public MaintenanceResponse updateMaintenance(String currentUsername, Long id, MaintenanceRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
         Maintenance maintenance = getOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(maintenance.getLift(), user.getOrganization().getId());
+
         MaintenanceStatus previousStatus = maintenance.getStatus();
-        applyRequest(maintenance, request);
+        Lift lift = getLiftOrThrow(request.getLiftId());
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
+
+        applyRequest(maintenance, request, lift);
         applyStatusTimestamps(maintenance, previousStatus);
         return saveAndMap(maintenance);
     }
 
     @Override
-    public void deleteMaintenance(Long id) {
+    public void deleteMaintenance(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
         Maintenance maintenance = getOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(maintenance.getLift(), user.getOrganization().getId());
         try {
             maintenanceRepository.delete(maintenance);
             maintenanceRepository.flush();
@@ -79,10 +98,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         }
     }
 
-    private void applyRequest(Maintenance maintenance, MaintenanceRequest request) {
-        Lift lift = liftRepository.findById(request.getLiftId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lift not found: " + request.getLiftId()));
-
+    private void applyRequest(Maintenance maintenance, MaintenanceRequest request, Lift lift) {
         maintenance.setLift(lift);
         maintenance.setTitle(request.getTitle().trim());
         maintenance.setDescription(request.getDescription());
@@ -113,15 +129,14 @@ public class MaintenanceServiceImpl implements MaintenanceService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
     }
 
+    private Lift getLiftOrThrow(Long liftId) {
+        return liftRepository.findById(liftId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lift not found: " + liftId));
+    }
+
     private MaintenanceResponse saveAndMap(Maintenance maintenance) {
         Maintenance saved = maintenanceRepository.saveAndFlush(maintenance);
         return SmartLiftMapper.toMaintenanceResponse(saved);
-    }
-
-    private void ensureLiftExists(Long liftId) {
-        if (!liftRepository.existsById(liftId)) {
-            throw new ResourceNotFoundException("Lift not found: " + liftId);
-        }
     }
 
     private Maintenance getOrThrow(Long id) {

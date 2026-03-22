@@ -8,12 +8,13 @@ import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Lift;
 import com.smartlift.model.Organization;
+import com.smartlift.model.User;
 import com.smartlift.model.enums.OrganizationType;
 import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.LiftService;
-import org.springframework.dao.DataIntegrityViolationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,37 +27,47 @@ public class LiftServiceImpl implements LiftService {
 
     private final LiftRepository liftRepository;
     private final OrganizationRepository organizationRepository;
+    private final SecurityContextHelper securityHelper;
 
     @Override
     @Transactional(readOnly = true)
-    public Page<LiftResponse> getAllLifts(Pageable pageable) {
-        return liftRepository.findAll(pageable)
+    public Page<LiftResponse> getAllLifts(String currentUsername, Pageable pageable) {
+        User user = securityHelper.resolveUser(currentUsername);
+        return liftRepository.findAllByOrganizationId(user.getOrganization().getId(), pageable)
                 .map(SmartLiftMapper::toLiftResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public LiftResponse getLiftById(Long id) {
-        return SmartLiftMapper.toLiftResponse(getDetailedLiftOrThrow(id));
+    public LiftResponse getLiftById(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Lift lift = getDetailedLiftOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
+        return SmartLiftMapper.toLiftResponse(lift);
     }
 
     @Override
-    public LiftResponse createLift(LiftRequest request) {
+    public LiftResponse createLift(String currentUsername, LiftRequest request) {
+        securityHelper.resolveUser(currentUsername);
         Lift lift = new Lift();
         applyLiftRequest(lift, request);
         return saveAndMap(lift);
     }
 
     @Override
-    public LiftResponse updateLift(Long id, LiftRequest request) {
+    public LiftResponse updateLift(String currentUsername, Long id, LiftRequest request) {
+        User user = securityHelper.resolveUser(currentUsername);
         Lift existingLift = getLiftOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(existingLift, user.getOrganization().getId());
         applyLiftRequest(existingLift, request);
         return saveAndMap(existingLift);
     }
 
     @Override
-    public void deleteLift(Long id) {
+    public void deleteLift(String currentUsername, Long id) {
+        User user = securityHelper.resolveUser(currentUsername);
         Lift existingLift = getLiftOrThrow(id);
+        securityHelper.checkLiftBelongsToOrg(existingLift, user.getOrganization().getId());
         try {
             liftRepository.delete(existingLift);
             liftRepository.flush();

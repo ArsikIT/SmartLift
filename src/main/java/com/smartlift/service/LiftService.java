@@ -7,13 +7,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface LiftService {
 
-    Page<LiftResponse> getAllLifts(Pageable pageable);
+    Page<LiftResponse> getAllLifts(String currentUsername, Pageable pageable);
 
-    LiftResponse getLiftById(Long id);
+    LiftResponse getLiftById(String currentUsername, Long id);
 
-    LiftResponse createLift(LiftRequest request);
+    LiftResponse createLift(String currentUsername, LiftRequest request);
 
-    LiftResponse updateLift(Long id, LiftRequest request);
+    LiftResponse updateLift(String currentUsername, Long id, LiftRequest request);
 
-    void deleteLift(Long id);
+    void deleteLift(String currentUsername, Long id);
 }

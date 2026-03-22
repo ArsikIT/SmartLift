@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
+
 public interface LiftEventRepository extends JpaRepository<LiftEvent, Long> {
 
     @EntityGraph(attributePaths = {"lift", "performedBy"})
@@ -22,4 +24,14 @@ public interface LiftEventRepository extends JpaRepository<LiftEvent, Long> {
     Optional<LiftEvent> findDetailedById(Long id);
 
     Optional<LiftEvent> findTopByLiftIdOrderByEventAtDescCreatedAtDesc(Long liftId);
+
+    @Query("""
+            select e from LiftEvent e
+            join fetch e.lift l
+            left join fetch e.performedBy
+            where l.manufacturerOrganization.id = :orgId
+               or l.serviceOrganization.id = :orgId
+               or l.managementOrganization.id = :orgId
+            """)
+    Page<LiftEvent> findAllByOrganizationId(Long orgId, Pageable pageable);
 }

@@ -7,17 +7,17 @@ import org.springframework.data.domain.Pageable;
 
 public interface DocumentService {
 
-    Page<DocumentResponse> getAllDocuments(Pageable pageable);
+    Page<DocumentResponse> getAllDocuments(String currentUsername, Pageable pageable);
 
-    Page<DocumentResponse> getDocumentsByLiftId(Long liftId, Pageable pageable);
+    Page<DocumentResponse> getDocumentsByLiftId(String currentUsername, Long liftId, Pageable pageable);
 
-    Page<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId, Pageable pageable);
+    Page<DocumentResponse> getDocumentsByMaintenanceId(String currentUsername, Long maintenanceId, Pageable pageable);
 
-    DocumentResponse getDocumentById(Long id);
+    DocumentResponse getDocumentById(String currentUsername, Long id);
 
-    DocumentResponse createDocument(DocumentRequest request);
+    DocumentResponse createDocument(String currentUsername, DocumentRequest request);
 
-    DocumentResponse updateDocument(Long id, DocumentRequest request);
+    DocumentResponse updateDocument(String currentUsername, Long id, DocumentRequest request);
 
-    void deleteDocument(Long id);
+    void deleteDocument(String currentUsername, Long id);
 }
