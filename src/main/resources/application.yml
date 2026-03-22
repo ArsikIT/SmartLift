@@ -1,6 +1,8 @@
 spring:
   application:
     name: SmartLift
+  profiles:
+    active: dev
 
   jpa:
     open-in-view: false
@@ -19,9 +21,9 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/smartlift
-    username: smartlift
-    password: smartlift
+    url: jdbc:postgresql://localhost:5433/smartlift
+    username: postgres
+    password: 0000
 
   jpa:
     hibernate:

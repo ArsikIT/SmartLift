@@ -2,11 +2,12 @@ package com.smartlift.service;
 
 import com.smartlift.dto.request.UserRequest;
 import com.smartlift.dto.response.UserResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    List<UserResponse> getAllUsers();
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
     UserResponse getUserById(Long id);
 

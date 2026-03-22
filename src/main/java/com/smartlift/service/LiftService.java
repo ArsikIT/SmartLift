@@ -2,11 +2,12 @@ package com.smartlift.service;
 
 import com.smartlift.dto.request.LiftRequest;
 import com.smartlift.dto.response.LiftResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LiftService {
 
-    List<LiftResponse> getAllLifts();
+    Page<LiftResponse> getAllLifts(Pageable pageable);
 
     LiftResponse getLiftById(Long id);
 

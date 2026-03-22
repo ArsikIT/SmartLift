@@ -2,15 +2,16 @@ package com.smartlift.service;
 
 import com.smartlift.dto.request.DocumentRequest;
 import com.smartlift.dto.response.DocumentResponse;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface DocumentService {
 
-    List<DocumentResponse> getAllDocuments();
+    Page<DocumentResponse> getAllDocuments(Pageable pageable);
 
-    List<DocumentResponse> getDocumentsByLiftId(Long liftId);
+    Page<DocumentResponse> getDocumentsByLiftId(Long liftId, Pageable pageable);
 
-    List<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId);
+    Page<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId, Pageable pageable);
 
     DocumentResponse getDocumentById(Long id);
 

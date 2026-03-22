@@ -15,8 +15,9 @@ import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.UserRepository;
 import com.smartlift.service.LiftEventService;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,19 +32,17 @@ public class LiftEventServiceImpl implements LiftEventService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LiftEventResponse> getAllEvents() {
-        return liftEventRepository.findAllByOrderByEventAtDesc().stream()
-                .map(SmartLiftMapper::toLiftEventResponse)
-                .toList();
+    public Page<LiftEventResponse> getAllEvents(Pageable pageable) {
+        return liftEventRepository.findAll(pageable)
+                .map(SmartLiftMapper::toLiftEventResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<LiftEventResponse> getEventsByLiftId(Long liftId) {
+    public Page<LiftEventResponse> getEventsByLiftId(Long liftId, Pageable pageable) {
         ensureLiftExists(liftId);
-        return liftEventRepository.findAllByLiftIdOrderByEventAtDesc(liftId).stream()
-                .map(SmartLiftMapper::toLiftEventResponse)
-                .toList();
+        return liftEventRepository.findAllByLiftId(liftId, pageable)
+                .map(SmartLiftMapper::toLiftEventResponse);
     }
 
     @Override

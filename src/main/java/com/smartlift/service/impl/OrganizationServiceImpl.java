@@ -8,9 +8,10 @@ import com.smartlift.mapper.SmartLiftMapper;
 import com.smartlift.model.Organization;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.OrganizationService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +24,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrganizationResponse> getAllOrganizations() {
-        return organizationRepository.findAll().stream()
-                .map(SmartLiftMapper::toOrganizationResponse)
-                .toList();
+    public Page<OrganizationResponse> getAllOrganizations(Pageable pageable) {
+        return organizationRepository.findAll(pageable)
+                .map(SmartLiftMapper::toOrganizationResponse);
     }
 
     @Override

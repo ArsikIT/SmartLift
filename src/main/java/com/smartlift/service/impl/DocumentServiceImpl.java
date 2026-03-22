@@ -13,8 +13,9 @@ import com.smartlift.repository.LiftRepository;
 import com.smartlift.repository.MaintenanceRepository;
 import com.smartlift.repository.UserRepository;
 import com.smartlift.service.DocumentService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,32 +31,29 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DocumentResponse> getAllDocuments() {
-        return documentRepository.findAll().stream()
-                .map(SmartLiftMapper::toDocumentResponse)
-                .toList();
+    public Page<DocumentResponse> getAllDocuments(Pageable pageable) {
+        return documentRepository.findAll(pageable)
+                .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DocumentResponse> getDocumentsByLiftId(Long liftId) {
+    public Page<DocumentResponse> getDocumentsByLiftId(Long liftId, Pageable pageable) {
         if (!liftRepository.existsById(liftId)) {
             throw new ResourceNotFoundException("Lift not found: " + liftId);
         }
-        return documentRepository.findAllByLiftId(liftId).stream()
-                .map(SmartLiftMapper::toDocumentResponse)
-                .toList();
+        return documentRepository.findAllByLiftId(liftId, pageable)
+                .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId) {
+    public Page<DocumentResponse> getDocumentsByMaintenanceId(Long maintenanceId, Pageable pageable) {
         if (!maintenanceRepository.existsById(maintenanceId)) {
             throw new ResourceNotFoundException("Maintenance not found: " + maintenanceId);
         }
-        return documentRepository.findAllByMaintenanceId(maintenanceId).stream()
-                .map(SmartLiftMapper::toDocumentResponse)
-                .toList();
+        return documentRepository.findAllByMaintenanceId(maintenanceId, pageable)
+                .map(SmartLiftMapper::toDocumentResponse);
     }
 
     @Override
