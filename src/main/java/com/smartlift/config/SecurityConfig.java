@@ -1,7 +1,9 @@
-package com.smartlift.security;
+package com.smartlift.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartlift.dto.response.ApiErrorResponse;
+import com.smartlift.security.JwtAuthenticationFilter;
+import com.smartlift.security.RateLimitFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    private final RateLimitFilter rateLimitFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
 
@@ -72,6 +74,7 @@ public class SecurityConfig {
                             objectMapper.writeValue(response.getOutputStream(), body);
                         })
                 )
+                .addFilterBefore(rateLimitFilter,JwtAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
