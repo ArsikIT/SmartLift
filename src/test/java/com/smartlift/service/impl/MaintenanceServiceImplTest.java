@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -166,11 +167,14 @@ class MaintenanceServiceImplTest {
         existing.setStartedAt(null);
         when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+        User technician = createUserWithOrg(7L, "technician", 10L);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(technician));
 
         MaintenanceRequest request = new MaintenanceRequest();
         request.setLiftId(5L);
         request.setTitle("Task");
         request.setStatus(MaintenanceStatus.IN_PROGRESS);
+        request.setAssignedTechnicianId(7L);
 
         when(maintenanceRepository.saveAndFlush(any(Maintenance.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -190,6 +194,8 @@ class MaintenanceServiceImplTest {
         existing.setCompletedAt(null);
         when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+        User technician = createUserWithOrg(1L, "admin", 10L);
+        existing.setAssignedTechnician(technician);
 
         MaintenanceRequest request = new MaintenanceRequest();
         request.setLiftId(5L);
@@ -214,11 +220,14 @@ class MaintenanceServiceImplTest {
         existing.setStartedAt(originalStartedAt);
         when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+        User technician = createUserWithOrg(7L, "technician", 10L);
+        when(userRepository.findById(7L)).thenReturn(Optional.of(technician));
 
         MaintenanceRequest request = new MaintenanceRequest();
         request.setLiftId(5L);
         request.setTitle("Task");
         request.setStatus(MaintenanceStatus.IN_PROGRESS);
+        request.setAssignedTechnicianId(7L);
 
         when(maintenanceRepository.saveAndFlush(any(Maintenance.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -256,6 +265,106 @@ class MaintenanceServiceImplTest {
         assertThatThrownBy(() -> maintenanceService.deleteMaintenance("admin", 20L))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("documents are attached");
+    }
+
+    @Test
+    void createMaintenance_throwsWhenCreatingDoneStatus() {
+        User user = createUserWithOrg(1L, "admin", 10L);
+        when(securityHelper.resolveUser("admin")).thenReturn(user);
+
+        Lift lift = createLift(5L, "SN-005");
+        when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+
+        MaintenanceRequest request = new MaintenanceRequest();
+        request.setLiftId(5L);
+        request.setTitle("Invalid");
+        request.setStatus(MaintenanceStatus.DONE);
+
+        assertThatThrownBy(() -> maintenanceService.createMaintenance("admin", request))
+                .isInstanceOf(com.smartlift.exception.BadRequestException.class)
+                .hasMessageContaining("cannot be created as completed");
+    }
+
+    @Test
+    void updateMaintenance_throwsWhenStartingWithoutAssignedTechnician() {
+        User user = createUserWithOrg(1L, "admin", 10L);
+        when(securityHelper.resolveUser("admin")).thenReturn(user);
+
+        Lift lift = createLift(5L, "SN-005");
+        Maintenance existing = createMaintenance(20L, lift, "Task", MaintenanceStatus.PENDING);
+        when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
+        when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+
+        MaintenanceRequest request = new MaintenanceRequest();
+        request.setLiftId(5L);
+        request.setTitle("Task");
+        request.setStatus(MaintenanceStatus.IN_PROGRESS);
+
+        assertThatThrownBy(() -> maintenanceService.updateMaintenance("admin", 20L, request))
+                .isInstanceOf(com.smartlift.exception.BadRequestException.class)
+                .hasMessageContaining("Assigned technician is required");
+    }
+
+    @Test
+    void updateMaintenance_throwsWhenCompletingByNonAssignedTechnician() {
+        User currentUser = createUserWithOrg(1L, "admin", 10L);
+        when(securityHelper.resolveUser("admin")).thenReturn(currentUser);
+
+        Lift lift = createLift(5L, "SN-005");
+        Maintenance existing = createMaintenance(20L, lift, "Task", MaintenanceStatus.IN_PROGRESS);
+        User assignedTechnician = createUserWithOrg(7L, "technician", 10L);
+        existing.setAssignedTechnician(assignedTechnician);
+        when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
+        when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+
+        MaintenanceRequest request = new MaintenanceRequest();
+        request.setLiftId(5L);
+        request.setTitle("Task");
+        request.setStatus(MaintenanceStatus.DONE);
+
+        assertThatThrownBy(() -> maintenanceService.updateMaintenance("admin", 20L, request))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("assigned technician");
+    }
+
+    @Test
+    void updateMaintenance_throwsWhenTryingToReopenInProgressMaintenance() {
+        User user = createUserWithOrg(1L, "admin", 10L);
+        when(securityHelper.resolveUser("admin")).thenReturn(user);
+
+        Lift lift = createLift(5L, "SN-005");
+        Maintenance existing = createMaintenance(20L, lift, "Task", MaintenanceStatus.IN_PROGRESS);
+        existing.setAssignedTechnician(createUserWithOrg(1L, "admin", 10L));
+        when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
+        when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+
+        MaintenanceRequest request = new MaintenanceRequest();
+        request.setLiftId(5L);
+        request.setTitle("Task");
+        request.setStatus(MaintenanceStatus.PENDING);
+
+        assertThatThrownBy(() -> maintenanceService.updateMaintenance("admin", 20L, request))
+                .isInstanceOf(com.smartlift.exception.BadRequestException.class)
+                .hasMessageContaining("cannot move back to pending");
+    }
+
+    @Test
+    void updateMaintenance_throwsWhenMaintenanceAlreadyDone() {
+        User user = createUserWithOrg(1L, "admin", 10L);
+        when(securityHelper.resolveUser("admin")).thenReturn(user);
+
+        Lift lift = createLift(5L, "SN-005");
+        Maintenance existing = createMaintenance(20L, lift, "Task", MaintenanceStatus.DONE);
+        when(maintenanceRepository.findById(20L)).thenReturn(Optional.of(existing));
+        when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
+
+        MaintenanceRequest request = new MaintenanceRequest();
+        request.setLiftId(5L);
+        request.setTitle("Updated");
+
+        assertThatThrownBy(() -> maintenanceService.updateMaintenance("admin", 20L, request))
+                .isInstanceOf(com.smartlift.exception.BadRequestException.class)
+                .hasMessageContaining("cannot be changed");
     }
 
     private User createUserWithOrg(Long userId, String username, Long orgId) {

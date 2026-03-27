@@ -2,6 +2,7 @@ package com.smartlift.service.impl;
 
 import com.smartlift.dto.request.MaintenanceRequest;
 import com.smartlift.dto.response.MaintenanceResponse;
+import com.smartlift.exception.BadRequestException;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
 import com.smartlift.mapper.SmartLiftMapper;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,10 +65,13 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         User user = securityHelper.resolveUser(currentUsername);
         Lift lift = getLiftOrThrow(request.getLiftId());
         securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
+        User assignedTechnician = resolveUser(request.getAssignedTechnicianId());
+        User requestedBy = resolveUser(request.getRequestedByUserId());
 
         Maintenance maintenance = new Maintenance();
         maintenance.setRequestedAt(LocalDateTime.now());
-        applyRequest(maintenance, request, lift);
+        validateCreationWorkflow(request.getStatus(), assignedTechnician);
+        applyRequest(maintenance, request, lift, assignedTechnician, requestedBy);
         return saveAndMap(maintenance);
     }
 
@@ -80,7 +85,17 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         Lift lift = getLiftOrThrow(request.getLiftId());
         securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
 
-        applyRequest(maintenance, request, lift);
+        validateEditable(maintenance);
+        User assignedTechnician = request.getAssignedTechnicianId() != null
+                ? resolveUser(request.getAssignedTechnicianId())
+                : maintenance.getAssignedTechnician();
+        User requestedBy = request.getRequestedByUserId() != null
+                ? resolveUser(request.getRequestedByUserId())
+                : maintenance.getRequestedBy();
+        MaintenanceStatus targetStatus = resolveTargetStatus(maintenance, request);
+
+        validateWorkflow(user, maintenance, targetStatus, assignedTechnician);
+        applyRequest(maintenance, request, lift, assignedTechnician, requestedBy);
         applyStatusTimestamps(maintenance, previousStatus);
         return saveAndMap(maintenance);
     }
@@ -99,14 +114,64 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     }
 
     private void applyRequest(Maintenance maintenance, MaintenanceRequest request, Lift lift) {
+        applyRequest(maintenance, request, lift,
+                resolveUser(request.getAssignedTechnicianId()),
+                resolveUser(request.getRequestedByUserId()));
+    }
+
+    private void applyRequest(Maintenance maintenance, MaintenanceRequest request, Lift lift,
+                              User assignedTechnician, User requestedBy) {
         maintenance.setLift(lift);
         maintenance.setTitle(request.getTitle().trim());
         maintenance.setDescription(request.getDescription());
         if (request.getStatus() != null) {
             maintenance.setStatus(request.getStatus());
         }
-        maintenance.setAssignedTechnician(resolveUser(request.getAssignedTechnicianId()));
-        maintenance.setRequestedBy(resolveUser(request.getRequestedByUserId()));
+        maintenance.setAssignedTechnician(assignedTechnician);
+        maintenance.setRequestedBy(requestedBy);
+    }
+
+    private void validateEditable(Maintenance maintenance) {
+        if (maintenance.getStatus() == MaintenanceStatus.DONE) {
+            throw new BadRequestException("Completed maintenance cannot be changed");
+        }
+    }
+
+    private void validateCreationWorkflow(MaintenanceStatus requestedStatus, User assignedTechnician) {
+        if (requestedStatus == MaintenanceStatus.DONE) {
+            throw new BadRequestException("Maintenance cannot be created as completed");
+        }
+        if (requestedStatus == MaintenanceStatus.IN_PROGRESS && assignedTechnician == null) {
+            throw new BadRequestException("Assigned technician is required to start maintenance");
+        }
+    }
+
+    private MaintenanceStatus resolveTargetStatus(Maintenance maintenance, MaintenanceRequest request) {
+        return request.getStatus() != null ? request.getStatus() : maintenance.getStatus();
+    }
+
+    private void validateWorkflow(User currentUser, Maintenance maintenance,
+                                  MaintenanceStatus targetStatus, User assignedTechnician) {
+        MaintenanceStatus currentStatus = maintenance.getStatus();
+
+        if (currentStatus == MaintenanceStatus.PENDING && targetStatus == MaintenanceStatus.DONE) {
+            throw new BadRequestException("Maintenance must be in progress before completion");
+        }
+        if (currentStatus == MaintenanceStatus.IN_PROGRESS && targetStatus == MaintenanceStatus.PENDING) {
+            throw new BadRequestException("Maintenance cannot move back to pending");
+        }
+        if (targetStatus == MaintenanceStatus.IN_PROGRESS && assignedTechnician == null) {
+            throw new BadRequestException("Assigned technician is required to start maintenance");
+        }
+        if (currentStatus == MaintenanceStatus.IN_PROGRESS && targetStatus == MaintenanceStatus.DONE) {
+            User effectiveTechnician = assignedTechnician != null ? assignedTechnician : maintenance.getAssignedTechnician();
+            if (effectiveTechnician == null) {
+                throw new BadRequestException("Assigned technician is required to complete maintenance");
+            }
+            if (!effectiveTechnician.getId().equals(currentUser.getId())) {
+                throw new AccessDeniedException("Only the assigned technician can complete maintenance");
+            }
+        }
     }
 
     private void applyStatusTimestamps(Maintenance maintenance, MaintenanceStatus previousStatus) {
