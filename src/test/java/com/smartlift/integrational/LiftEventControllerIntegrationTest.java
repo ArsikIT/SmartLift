@@ -84,8 +84,8 @@ class LiftEventControllerIntegrationTest extends BaseIntegrationTest {
 
         LiftEventRequest request = new LiftEventRequest();
         request.setLiftId(ctx.liftId.longValue());
-        request.setType(LiftEventType.FAULT);
-        request.setDescription("Fault detected");
+        request.setType(LiftEventType.INSTALLED);
+        request.setDescription("Installed at building");
 
         mockMvc.perform(post("/api/events")
                         .header("Authorization", "Bearer " + ctx.token)
@@ -111,7 +111,7 @@ class LiftEventControllerIntegrationTest extends BaseIntegrationTest {
 
         LiftEventRequest createReq = new LiftEventRequest();
         createReq.setLiftId(ctx.liftId.longValue());
-        createReq.setType(LiftEventType.REPAIR);
+        createReq.setType(LiftEventType.INSTALLED);
         createReq.setDescription("Original description");
 
         MvcResult createResult = mockMvc.perform(post("/api/events")
@@ -125,7 +125,7 @@ class LiftEventControllerIntegrationTest extends BaseIntegrationTest {
 
         LiftEventRequest updateReq = new LiftEventRequest();
         updateReq.setLiftId(ctx.liftId.longValue());
-        updateReq.setType(LiftEventType.REPAIR);
+        updateReq.setType(LiftEventType.INSTALLED);
         updateReq.setDescription("Updated description");
 
         mockMvc.perform(put("/api/events/" + eventId)
