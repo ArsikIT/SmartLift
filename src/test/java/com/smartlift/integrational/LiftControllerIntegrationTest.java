@@ -114,7 +114,6 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
         updateReq.setSerialNumber("LIFT-UPD-001");
         updateReq.setModel("NewModel");
         updateReq.setManufacturer("NewMfg");
-        updateReq.setStatus(LiftStatus.ACTIVE);
         updateReq.setManufacturerOrganizationId(admin.getOrganization().getId());
 
         mockMvc.perform(put("/api/lifts/" + liftId)
@@ -123,7 +122,7 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(updateReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.model").value("NewModel"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"));
+                .andExpect(jsonPath("$.manufacturer").value("NewMfg"));
     }
 
     @Test

@@ -113,6 +113,7 @@ class LiftEventServiceImplTest {
         when(securityHelper.resolveUser("admin")).thenReturn(user);
 
         Lift lift = createLift(5L, "SN-005");
+        lift.setStatus(LiftStatus.ACTIVE);
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
 
         LiftEventRequest request = new LiftEventRequest();
@@ -161,6 +162,7 @@ class LiftEventServiceImplTest {
         when(securityHelper.resolveUser("admin")).thenReturn(user);
 
         Lift lift = createLift(5L, "SN-005");
+        lift.setStatus(LiftStatus.FAULTY);
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
 
         User performer = new User();
@@ -192,6 +194,7 @@ class LiftEventServiceImplTest {
         when(securityHelper.resolveUser("admin")).thenReturn(user);
 
         Lift lift = createLift(5L, "SN-005");
+        lift.setStatus(LiftStatus.ACTIVE);
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -212,6 +215,7 @@ class LiftEventServiceImplTest {
         when(securityHelper.resolveUser("admin")).thenReturn(user);
 
         Lift lift = createLift(5L, "SN-005");
+        lift.setStatus(LiftStatus.FAULTY);
         LiftEvent event = createEvent(30L, lift, LiftEventType.FAULT);
         when(liftEventRepository.findById(30L)).thenReturn(Optional.of(event));
         when(liftRepository.findById(5L)).thenReturn(Optional.of(lift));
@@ -230,6 +234,7 @@ class LiftEventServiceImplTest {
         when(securityHelper.resolveUser("admin")).thenReturn(user);
 
         Lift oldLift = createLift(5L, "SN-OLD");
+        oldLift.setStatus(LiftStatus.FAULTY);
         Lift newLift = createLift(6L, "SN-NEW");
 
         LiftEvent existingEvent = createEvent(30L, oldLift, LiftEventType.FAULT);

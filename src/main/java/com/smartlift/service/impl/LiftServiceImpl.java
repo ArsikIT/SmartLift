@@ -81,8 +81,8 @@ public class LiftServiceImpl implements LiftService {
         lift.setSerialNumber(request.getSerialNumber());
         lift.setModel(request.getModel());
         lift.setManufacturer(request.getManufacturer());
-        if (request.getStatus() != null) {
-            lift.setStatus(request.getStatus());
+        if (request.getStatus() != null && lift.getId() != null) {
+            throw new BadRequestException("Lift status can only be changed through events");
         }
         lift.setManufacturerOrganization(resolveOrganization(
                 request.getManufacturerOrganizationId(),

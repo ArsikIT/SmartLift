@@ -105,7 +105,7 @@ public class LiftEventServiceImpl implements LiftEventService {
     }
 
     private void applyEventRequest(LiftEvent event, LiftEventRequest request, Lift lift) {
-        validateEventBusinessRules(request);
+        validateEventBusinessRules(request, lift);
         event.setLift(lift);
         event.setType(request.getType());
         event.setEventAt(request.getEventAt() != null ? request.getEventAt() : LocalDateTime.now());
@@ -113,10 +113,27 @@ public class LiftEventServiceImpl implements LiftEventService {
         event.setPerformedBy(resolveUser(request.getPerformedByUserId()));
     }
 
-    private void validateEventBusinessRules(LiftEventRequest request) {
+    private void validateEventBusinessRules(LiftEventRequest request, Lift lift) {
         LocalDateTime eventAt = request.getEventAt();
         if (eventAt != null && eventAt.isAfter(LocalDateTime.now())) {
             throw new BadRequestException("Event time cannot be in the future");
+        }
+        validateStatusTransition(lift, request.getType());
+    }
+
+    private void validateStatusTransition(Lift lift, LiftEventType eventType) {
+        LiftStatus currentStatus = lift.getStatus();
+        LiftStatus targetStatus = mapEventTypeToLiftStatus(eventType);
+
+        if (currentStatus == targetStatus) {
+            return;
+        }
+
+        if (!currentStatus.canTransitionTo(targetStatus)) {
+            throw new BadRequestException(
+                    "Invalid status transition: " + currentStatus + " → " + targetStatus
+                            + ". Allowed transitions from " + currentStatus + ": " + currentStatus.allowedTransitions()
+            );
         }
     }
 
@@ -139,19 +156,14 @@ public class LiftEventServiceImpl implements LiftEventService {
     }
 
     private LiftStatus mapEventTypeToLiftStatus(LiftEventType eventType) {
-        if (eventType == LiftEventType.CREATED) {
-            return LiftStatus.CREATED;
-        }
-        if (eventType == LiftEventType.INSTALLED) {
-            return LiftStatus.INSTALLED;
-        }
-        if (eventType == LiftEventType.FAULT) {
-            return LiftStatus.FAULTY;
-        }
-        if (eventType == LiftEventType.REPAIR) {
-            return LiftStatus.IN_REPAIR;
-        }
-        return LiftStatus.CREATED;
+        return switch (eventType) {
+            case CREATED -> LiftStatus.CREATED;
+            case INSTALLED -> LiftStatus.INSTALLED;
+            case ACTIVATED -> LiftStatus.ACTIVE;
+            case FAULT -> LiftStatus.FAULTY;
+            case REPAIR -> LiftStatus.IN_REPAIR;
+            case DECOMMISSIONED -> LiftStatus.DECOMMISSIONED;
+        };
     }
 
     private Lift getLiftOrThrow(Long id) {
