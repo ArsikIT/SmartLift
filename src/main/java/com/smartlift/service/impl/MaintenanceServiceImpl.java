@@ -2,6 +2,7 @@ package com.smartlift.service.impl;
 
 import com.smartlift.dto.request.MaintenanceRequest;
 import com.smartlift.dto.response.MaintenanceResponse;
+import com.smartlift.event.MaintenanceCreatedEvent;
 import com.smartlift.exception.BadRequestException;
 import com.smartlift.exception.ConflictException;
 import com.smartlift.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import com.smartlift.repository.UserRepository;
 import com.smartlift.service.MaintenanceService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     private final LiftRepository liftRepository;
     private final UserRepository userRepository;
     private final SecurityContextHelper securityHelper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,7 +75,9 @@ public class MaintenanceServiceImpl implements MaintenanceService {
         maintenance.setRequestedAt(LocalDateTime.now());
         validateCreationWorkflow(request.getStatus(), assignedTechnician);
         applyRequest(maintenance, request, lift, assignedTechnician, requestedBy);
-        return saveAndMap(maintenance);
+        MaintenanceResponse response = saveAndMap(maintenance);
+        eventPublisher.publishEvent(new MaintenanceCreatedEvent(this, maintenance));
+        return response;
     }
 
     @Override

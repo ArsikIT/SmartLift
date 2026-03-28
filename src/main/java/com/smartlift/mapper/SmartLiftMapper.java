@@ -4,6 +4,7 @@ import com.smartlift.dto.response.DocumentResponse;
 import com.smartlift.dto.response.LiftEventResponse;
 import com.smartlift.dto.response.LiftResponse;
 import com.smartlift.dto.response.MaintenanceResponse;
+import com.smartlift.dto.response.NotificationResponse;
 import com.smartlift.dto.response.OrganizationResponse;
 import com.smartlift.dto.response.OrganizationSummaryResponse;
 import com.smartlift.dto.response.UserResponse;
@@ -12,6 +13,7 @@ import com.smartlift.model.Document;
 import com.smartlift.model.Lift;
 import com.smartlift.model.LiftEvent;
 import com.smartlift.model.Maintenance;
+import com.smartlift.model.Notification;
 import com.smartlift.model.Organization;
 import com.smartlift.model.Role;
 import com.smartlift.model.User;
@@ -98,6 +100,18 @@ public final class SmartLiftMapper {
                 .completedAt(m.getCompletedAt())
                 .createdAt(m.getCreatedAt())
                 .updatedAt(m.getUpdatedAt())
+                .build();
+    }
+
+    public static NotificationResponse toNotificationResponse(Notification n) {
+        return NotificationResponse.builder()
+                .id(n.getId())
+                .title(n.getTitle())
+                .message(n.getMessage())
+                .isRead(n.isRead())
+                .liftId(n.getLift() != null ? n.getLift().getId() : null)
+                .maintenanceId(n.getMaintenance() != null ? n.getMaintenance().getId() : null)
+                .createdAt(n.getCreatedAt())
                 .build();
     }
 
