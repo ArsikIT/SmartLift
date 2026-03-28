@@ -11,6 +11,8 @@ public interface LiftService {
 
     LiftResponse getLiftById(String currentUsername, Long id);
 
+    LiftResponse getLiftBySerialNumber(String currentUsername, String serialNumber);
+
     LiftResponse createLift(String currentUsername, LiftRequest request);
 
     LiftResponse updateLift(String currentUsername, Long id, LiftRequest request);

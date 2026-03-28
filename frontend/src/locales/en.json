@@ -1,0 +1,168 @@
+{
+  "app": {
+    "name": "SmartLift"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "lifts": "Lifts",
+    "maintenances": "Maintenances",
+    "events": "Events",
+    "users": "Users",
+    "organizations": "Organizations",
+    "notifications": "Notifications",
+    "scanner": "QR Scanner"
+  },
+  "auth": {
+    "login": "Sign in",
+    "loginTitle": "Login",
+    "register": "Create account",
+    "registerTitle": "Register",
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "orgName": "Organization name",
+    "orgType": "Organization type",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{username}}!"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "actions": "Actions",
+    "confirm_delete": "Are you sure you want to delete?",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}",
+    "noData": "No data found",
+    "markRead": "Mark read",
+    "markAllRead": "Mark all as read"
+  },
+  "lifts": {
+    "title": "Lifts",
+    "add": "+ Add Lift",
+    "new": "New Lift",
+    "editTitle": "Edit Lift",
+    "serialNumber": "Serial Number",
+    "model": "Model",
+    "manufacturer": "Manufacturer",
+    "status": "Status",
+    "serviceOrg": "Service Org",
+    "serviceOrgId": "Service Organization ID",
+    "manufacturerOrgId": "Manufacturer Organization ID",
+    "managementOrgId": "Management Organization ID",
+    "empty": "No lifts found",
+    "confirmDelete": "Delete this lift?"
+  },
+  "maintenances": {
+    "title": "Maintenances",
+    "add": "+ New Request",
+    "new": "New Maintenance",
+    "editTitle": "Edit Maintenance",
+    "liftId": "Lift ID",
+    "titleField": "Title",
+    "description": "Description",
+    "status": "Status",
+    "technician": "Technician",
+    "technicianId": "Assigned Technician ID",
+    "requestedBy": "Requested By",
+    "requestedById": "Requested By User ID",
+    "requested": "Requested",
+    "lift": "Lift",
+    "empty": "No maintenances found",
+    "confirmDelete": "Delete this maintenance?"
+  },
+  "events": {
+    "title": "Lift Events",
+    "add": "+ Add Event",
+    "new": "New Event",
+    "editTitle": "Edit Event",
+    "liftId": "Lift ID",
+    "lift": "Lift",
+    "type": "Type",
+    "description": "Description",
+    "performedBy": "Performed By",
+    "performedById": "Performed By User ID",
+    "date": "Date",
+    "empty": "No events found",
+    "confirmDelete": "Delete this event?"
+  },
+  "users": {
+    "title": "Users",
+    "add": "+ Add User",
+    "new": "New User",
+    "editTitle": "Edit User",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "(leave blank to keep)",
+    "organization": "Organization",
+    "roles": "Roles",
+    "status": "Status",
+    "enabled": "Enabled",
+    "active": "Active",
+    "disabled": "Disabled",
+    "empty": "No users found",
+    "confirmDelete": "Delete this user?"
+  },
+  "organizations": {
+    "title": "My Organization",
+    "editTitle": "Edit Organization",
+    "name": "Name",
+    "type": "Type",
+    "address": "Address",
+    "contactEmail": "Contact Email",
+    "contactPhone": "Contact Phone",
+    "created": "Created",
+    "empty": "No organization found"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications"
+  },
+  "orgTypes": {
+    "MANUFACTURER": "Manufacturer",
+    "SERVICE": "Service company",
+    "MANAGEMENT": "Management company"
+  },
+  "liftStatuses": {
+    "CREATED": "Created",
+    "INSTALLED": "Installed",
+    "ACTIVE": "Active",
+    "FAULTY": "Faulty",
+    "IN_REPAIR": "In Repair",
+    "DECOMMISSIONED": "Decommissioned"
+  },
+  "maintenanceStatuses": {
+    "PENDING": "Pending",
+    "IN_PROGRESS": "In Progress",
+    "DONE": "Done"
+  },
+  "eventTypes": {
+    "CREATED": "Created",
+    "INSTALLED": "Installed",
+    "ACTIVATED": "Activated",
+    "FAULT": "Fault",
+    "REPAIR": "Repair",
+    "DECOMMISSIONED": "Decommissioned"
+  },
+  "qr": {
+    "download": "Download PNG",
+    "scanTitle": "QR Scanner",
+    "scanHint": "Point your camera at a lift QR code to view its details",
+    "startScan": "Start scanning",
+    "scanAgain": "Scan again",
+    "cameraError": "Could not access camera. Please allow camera permissions."
+  }
+}

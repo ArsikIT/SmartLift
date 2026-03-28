@@ -9,6 +9,8 @@ import com.smartlift.model.User;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final SecurityContextHelper securityHelper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrganizationResponse> getAllOrganizations(Pageable pageable) {
+        return organizationRepository.findAll(pageable)
+                .map(SmartLiftMapper::toOrganizationResponse);
+    }
 
     @Override
     @Transactional(readOnly = true)

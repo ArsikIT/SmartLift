@@ -1,0 +1,168 @@
+{
+  "app": {
+    "name": "SmartLift"
+  },
+  "nav": {
+    "dashboard": "Басты бет",
+    "lifts": "Лифттер",
+    "maintenances": "Өтінімдер",
+    "events": "Оқиғалар",
+    "users": "Пайдаланушылар",
+    "organizations": "Ұйымдар",
+    "notifications": "Хабарламалар",
+    "scanner": "QR Сканер"
+  },
+  "auth": {
+    "login": "Кіру",
+    "loginTitle": "Кіру",
+    "register": "Тіркелу",
+    "registerTitle": "Тіркелу",
+    "username": "Пайдаланушы аты",
+    "password": "Құпия сөз",
+    "email": "Электрондық пошта",
+    "orgName": "Ұйым атауы",
+    "orgType": "Ұйым түрі",
+    "signingIn": "Кіру...",
+    "creatingAccount": "Аккаунт жасалуда...",
+    "noAccount": "Аккаунтыңыз жоқ па?",
+    "hasAccount": "Аккаунтыңыз бар ма?",
+    "logout": "Шығу"
+  },
+  "dashboard": {
+    "title": "Басты бет",
+    "welcome": "Қош келдіңіз, {{username}}!"
+  },
+  "common": {
+    "loading": "Жүктелуде...",
+    "save": "Сақтау",
+    "saving": "Сақталуда...",
+    "cancel": "Бас тарту",
+    "edit": "Өзгерту",
+    "delete": "Жою",
+    "create": "Жасау",
+    "actions": "Әрекеттер",
+    "confirm_delete": "Жоюға сенімдісіз бе?",
+    "prev": "Артқа",
+    "next": "Алға",
+    "page": "{{current}} / {{total}} бет",
+    "noData": "Деректер табылмады",
+    "markRead": "Оқылды",
+    "markAllRead": "Барлығын оқылды деп белгілеу"
+  },
+  "lifts": {
+    "title": "Лифттер",
+    "add": "+ Лифт қосу",
+    "new": "Жаңа лифт",
+    "editTitle": "Лифтті өзгерту",
+    "serialNumber": "Сериялық нөмір",
+    "model": "Модель",
+    "manufacturer": "Өндіруші",
+    "status": "Күйі",
+    "serviceOrg": "Сервис ұйымы",
+    "serviceOrgId": "Сервис ұйымының ID",
+    "manufacturerOrgId": "Өндіруші ұйымның ID",
+    "managementOrgId": "Басқару ұйымының ID",
+    "empty": "Лифттер табылмады",
+    "confirmDelete": "Бұл лифтті жою керек пе?"
+  },
+  "maintenances": {
+    "title": "Өтінімдер",
+    "add": "+ Жаңа өтінім",
+    "new": "Жаңа өтінім",
+    "editTitle": "Өтінімді өзгерту",
+    "liftId": "Лифт ID",
+    "titleField": "Тақырып",
+    "description": "Сипаттама",
+    "status": "Күйі",
+    "technician": "Техник",
+    "technicianId": "Тағайындалған техник ID",
+    "requestedBy": "Өтінім берген",
+    "requestedById": "Өтінім берген ID",
+    "requested": "Өтінім күні",
+    "lift": "Лифт",
+    "empty": "Өтінімдер табылмады",
+    "confirmDelete": "Бұл өтінімді жою керек пе?"
+  },
+  "events": {
+    "title": "Лифт оқиғалары",
+    "add": "+ Оқиға қосу",
+    "new": "Жаңа оқиға",
+    "editTitle": "Оқиғаны өзгерту",
+    "liftId": "Лифт ID",
+    "lift": "Лифт",
+    "type": "Түрі",
+    "description": "Сипаттама",
+    "performedBy": "Орындаған",
+    "performedById": "Орындаған ID",
+    "date": "Күні",
+    "empty": "Оқиғалар табылмады",
+    "confirmDelete": "Бұл оқиғаны жою керек пе?"
+  },
+  "users": {
+    "title": "Пайдаланушылар",
+    "add": "+ Пайдаланушы қосу",
+    "new": "Жаңа пайдаланушы",
+    "editTitle": "Пайдаланушыны өзгерту",
+    "username": "Пайдаланушы аты",
+    "email": "Электрондық пошта",
+    "password": "Құпия сөз",
+    "passwordHint": "(өзгертпеу үшін бос қалдырыңыз)",
+    "organization": "Ұйым",
+    "roles": "Рөлдер",
+    "status": "Күйі",
+    "enabled": "Белсенді",
+    "active": "Белсенді",
+    "disabled": "Өшірілген",
+    "empty": "Пайдаланушылар табылмады",
+    "confirmDelete": "Бұл пайдаланушыны жою керек пе?"
+  },
+  "organizations": {
+    "title": "Менің ұйымым",
+    "editTitle": "Ұйымды өзгерту",
+    "name": "Атауы",
+    "type": "Түрі",
+    "address": "Мекенжай",
+    "contactEmail": "Байланыс email",
+    "contactPhone": "Байланыс телефон",
+    "created": "Құрылған",
+    "empty": "Ұйым табылмады"
+  },
+  "notifications": {
+    "title": "Хабарламалар",
+    "empty": "Хабарламалар жоқ"
+  },
+  "orgTypes": {
+    "MANUFACTURER": "Өндіруші",
+    "SERVICE": "Сервистік компания",
+    "MANAGEMENT": "Басқару компаниясы"
+  },
+  "liftStatuses": {
+    "CREATED": "Жасалған",
+    "INSTALLED": "Орнатылған",
+    "ACTIVE": "Белсенді",
+    "FAULTY": "Ақаулы",
+    "IN_REPAIR": "Жөндеуде",
+    "DECOMMISSIONED": "Пайдаланудан шығарылған"
+  },
+  "maintenanceStatuses": {
+    "PENDING": "Күтуде",
+    "IN_PROGRESS": "Орындалуда",
+    "DONE": "Аяқталды"
+  },
+  "eventTypes": {
+    "CREATED": "Жасалу",
+    "INSTALLED": "Орнату",
+    "ACTIVATED": "Белсендіру",
+    "FAULT": "Ақау",
+    "REPAIR": "Жөндеу",
+    "DECOMMISSIONED": "Шығару"
+  },
+  "qr": {
+    "download": "PNG жүктеу",
+    "scanTitle": "QR Сканер",
+    "scanHint": "Лифттің QR-кодына камераны бағыттаңыз",
+    "startScan": "Сканерлеуді бастау",
+    "scanAgain": "Қайта сканерлеу",
+    "cameraError": "Камераға қол жеткізу мүмкін болмады. Камераға рұқсат беріңіз."
+  }
+}

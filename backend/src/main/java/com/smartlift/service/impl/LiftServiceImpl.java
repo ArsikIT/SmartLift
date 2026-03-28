@@ -47,6 +47,16 @@ public class LiftServiceImpl implements LiftService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public LiftResponse getLiftBySerialNumber(String currentUsername, String serialNumber) {
+        User user = securityHelper.resolveUser(currentUsername);
+        Lift lift = liftRepository.findBySerialNumber(serialNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Lift not found with serial number: " + serialNumber));
+        securityHelper.checkLiftBelongsToOrg(lift, user.getOrganization().getId());
+        return SmartLiftMapper.toLiftResponse(lift);
+    }
+
+    @Override
     public LiftResponse createLift(String currentUsername, LiftRequest request) {
         securityHelper.resolveUser(currentUsername);
         Lift lift = new Lift();

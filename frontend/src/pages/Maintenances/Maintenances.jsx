@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import '../shared.css';
 
@@ -20,6 +21,7 @@ const EMPTY_FORM = {
 };
 
 export default function Maintenances() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -99,7 +101,7 @@ export default function Maintenances() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this maintenance?')) return;
+    if (!confirm(t('maintenances.confirmDelete'))) return;
     try {
       await api.delete(`/maintenances/${id}`);
       fetchData();
@@ -117,27 +119,27 @@ export default function Maintenances() {
   return (
     <div>
       <div className="page-header">
-        <h2>Maintenances</h2>
-        <button className="btn btn-primary" onClick={openCreate}>+ New Request</button>
+        <h2>{t('maintenances.title')}</h2>
+        <button className="btn btn-primary" onClick={openCreate}>{t('maintenances.add')}</button>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : items.length === 0 ? (
-        <div className="empty-state">No maintenances found</div>
+        <div className="empty-state">{t('maintenances.empty')}</div>
       ) : (
         <>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Lift</th>
-                <th>Status</th>
-                <th>Technician</th>
-                <th>Requested</th>
-                <th>Actions</th>
+                <th>{t('maintenances.titleField')}</th>
+                <th>{t('maintenances.lift')}</th>
+                <th>{t('maintenances.status')}</th>
+                <th>{t('maintenances.technician')}</th>
+                <th>{t('maintenances.requested')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -147,14 +149,14 @@ export default function Maintenances() {
                   <td>{m.liftSerialNumber}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGES[m.status] || 'badge-gray'}`}>
-                      {m.status}
+                      {t(`maintenanceStatuses.${m.status}`)}
                     </span>
                   </td>
                   <td>{m.assignedTechnician?.username || '—'}</td>
                   <td>{formatDate(m.requestedAt)}</td>
                   <td className="actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(m)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(m.id)}>Delete</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(m)}>{t('common.edit')}</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(m.id)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -162,9 +164,9 @@ export default function Maintenances() {
           </table>
 
           <div className="pagination">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
-            <span>Page {page + 1} of {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>Next</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>{t('common.prev')}</button>
+            <span>{t('common.page', { current: page + 1, total: totalPages })}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>{t('common.next')}</button>
           </div>
         </>
       )}
@@ -172,41 +174,41 @@ export default function Maintenances() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editId ? 'Edit Maintenance' : 'New Maintenance'}</h3>
+            <h3>{editId ? t('maintenances.editTitle') : t('maintenances.new')}</h3>
             {formError && <div className="error-msg">{formError}</div>}
             <form onSubmit={handleSave}>
               <label>
-                Lift ID *
+                {t('maintenances.liftId')} *
                 <input name="liftId" type="number" value={form.liftId} onChange={handleChange} required />
               </label>
               <label>
-                Title *
+                {t('maintenances.titleField')} *
                 <input name="title" value={form.title} onChange={handleChange} required />
               </label>
               <label>
-                Description
+                {t('maintenances.description')}
                 <textarea name="description" value={form.description} onChange={handleChange} />
               </label>
               <label>
-                Status
+                {t('maintenances.status')}
                 <select name="status" value={form.status} onChange={handleChange}>
                   {STATUSES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>{t(`maintenanceStatuses.${s}`)}</option>
                   ))}
                 </select>
               </label>
               <label>
-                Assigned Technician ID
+                {t('maintenances.technicianId')}
                 <input name="assignedTechnicianId" type="number" value={form.assignedTechnicianId} onChange={handleChange} />
               </label>
               <label>
-                Requested By User ID
+                {t('maintenances.requestedById')}
                 <input name="requestedByUserId" type="number" value={form.requestedByUserId} onChange={handleChange} />
               </label>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
               </div>
             </form>

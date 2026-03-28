@@ -11,6 +11,7 @@ import Events from './pages/Events/Events';
 import Users from './pages/Users/Users';
 import Organizations from './pages/Organizations/Organizations';
 import Notifications from './pages/Notifications/Notifications';
+import Scanner from './pages/Scanner/Scanner';
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="users" element={<Users />} />
             <Route path="organizations" element={<Organizations />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="scan" element={<Scanner />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

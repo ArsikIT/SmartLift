@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import '../shared.css';
 
@@ -10,6 +11,7 @@ const EMPTY_FORM = {
 };
 
 export default function Users() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -85,7 +87,7 @@ export default function Users() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this user?')) return;
+    if (!confirm(t('users.confirmDelete'))) return;
     try {
       await api.delete(`/users/${id}`);
       fetchData();
@@ -102,27 +104,27 @@ export default function Users() {
   return (
     <div>
       <div className="page-header">
-        <h2>Users</h2>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add User</button>
+        <h2>{t('users.title')}</h2>
+        <button className="btn btn-primary" onClick={openCreate}>{t('users.add')}</button>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : items.length === 0 ? (
-        <div className="empty-state">No users found</div>
+        <div className="empty-state">{t('users.empty')}</div>
       ) : (
         <>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Organization</th>
-                <th>Roles</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t('users.username')}</th>
+                <th>{t('users.email')}</th>
+                <th>{t('users.organization')}</th>
+                <th>{t('users.roles')}</th>
+                <th>{t('users.status')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -134,12 +136,12 @@ export default function Users() {
                   <td>{u.roles ? [...u.roles].join(', ') : '—'}</td>
                   <td>
                     <span className={`badge ${u.enabled ? 'badge-green' : 'badge-red'}`}>
-                      {u.enabled ? 'Active' : 'Disabled'}
+                      {u.enabled ? t('users.active') : t('users.disabled')}
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(u)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>Delete</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(u)}>{t('common.edit')}</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -147,9 +149,9 @@ export default function Users() {
           </table>
 
           <div className="pagination">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
-            <span>Page {page + 1} of {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>Next</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>{t('common.prev')}</button>
+            <span>{t('common.page', { current: page + 1, total: totalPages })}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>{t('common.next')}</button>
           </div>
         </>
       )}
@@ -157,29 +159,29 @@ export default function Users() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editId ? 'Edit User' : 'New User'}</h3>
+            <h3>{editId ? t('users.editTitle') : t('users.new')}</h3>
             {formError && <div className="error-msg">{formError}</div>}
             <form onSubmit={handleSave}>
               <label>
-                Username *
+                {t('users.username')} *
                 <input name="username" value={form.username} onChange={handleChange} required />
               </label>
               <label>
-                Email *
+                {t('users.email')} *
                 <input name="email" type="email" value={form.email} onChange={handleChange} required />
               </label>
               <label>
-                Password {editId ? '(leave blank to keep)' : '*'}
+                {t('users.password')} {editId ? t('users.passwordHint') : '*'}
                 <input name="password" type="password" value={form.password} onChange={handleChange} minLength={8} {...(!editId && { required: true })} />
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row' }}>
                 <input name="enabled" type="checkbox" checked={form.enabled} onChange={handleChange} style={{ width: 'auto', marginTop: 0 }} />
-                Enabled
+                {t('users.enabled')}
               </label>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
               </div>
             </form>

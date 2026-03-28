@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { register } from '../../api/auth';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 import '../Login/Login.css';
 
-const ORG_TYPES = [
-  { value: 'MANUFACTURER', label: 'Manufacturer' },
-  { value: 'SERVICE', label: 'Service company' },
-  { value: 'MANAGEMENT', label: 'Management company' },
-];
+const ORG_TYPE_KEYS = ['MANUFACTURER', 'SERVICE', 'MANAGEMENT'];
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -20,6 +18,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -43,13 +42,16 @@ export default function Register() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>SmartLift</h1>
-        <h2>Register</h2>
+        <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+          <LanguageSwitcher />
+        </div>
+        <h1>{t('app.name')}</h1>
+        <h2>{t('auth.registerTitle')}</h2>
 
         {error && <div className="auth-error">{error}</div>}
 
         <label>
-          Username
+          {t('auth.username')}
           <input
             type="text"
             name="username"
@@ -61,7 +63,7 @@ export default function Register() {
         </label>
 
         <label>
-          Email
+          {t('auth.email')}
           <input
             type="email"
             name="email"
@@ -72,7 +74,7 @@ export default function Register() {
         </label>
 
         <label>
-          Password
+          {t('auth.password')}
           <input
             type="password"
             name="password"
@@ -84,7 +86,7 @@ export default function Register() {
         </label>
 
         <label>
-          Organization name
+          {t('auth.orgName')}
           <input
             type="text"
             name="organizationName"
@@ -95,27 +97,27 @@ export default function Register() {
         </label>
 
         <label>
-          Organization type
+          {t('auth.orgType')}
           <select
             name="organizationType"
             value={form.organizationType}
             onChange={handleChange}
             required
           >
-            {ORG_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+            {ORG_TYPE_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {t(`orgTypes.${key}`)}
               </option>
             ))}
           </select>
         </label>
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Creating account...' : 'Create account'}
+          {loading ? t('auth.creatingAccount') : t('auth.register')}
         </button>
 
         <p className="auth-link">
-          Already have an account? <Link to="/login">Sign in</Link>
+          {t('auth.hasAccount')} <Link to="/login">{t('auth.loginTitle')}</Link>
         </p>
       </form>
     </div>

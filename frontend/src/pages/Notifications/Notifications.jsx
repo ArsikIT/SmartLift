@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import '../shared.css';
 
 export default function Notifications() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -48,16 +50,16 @@ export default function Notifications() {
   return (
     <div>
       <div className="page-header">
-        <h2>Notifications</h2>
-        <button className="btn btn-secondary" onClick={markAllAsRead}>Mark all as read</button>
+        <h2>{t('notifications.title')}</h2>
+        <button className="btn btn-secondary" onClick={markAllAsRead}>{t('common.markAllRead')}</button>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : items.length === 0 ? (
-        <div className="empty-state">No notifications</div>
+        <div className="empty-state">{t('notifications.empty')}</div>
       ) : (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -83,13 +85,13 @@ export default function Notifications() {
                   </div>
                   <div style={{ fontSize: '12px', color: '#999' }}>
                     {formatDate(n.createdAt)}
-                    {n.liftId && ` · Lift #${n.liftId}`}
-                    {n.maintenanceId && ` · Maintenance #${n.maintenanceId}`}
+                    {n.liftId && ` · ${t('nav.lifts')} #${n.liftId}`}
+                    {n.maintenanceId && ` · ${t('nav.maintenances')} #${n.maintenanceId}`}
                   </div>
                 </div>
                 {!n.read && (
                   <button className="btn btn-secondary btn-sm" onClick={() => markAsRead(n.id)}>
-                    Mark read
+                    {t('common.markRead')}
                   </button>
                 )}
               </div>
@@ -97,9 +99,9 @@ export default function Notifications() {
           </div>
 
           <div className="pagination">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
-            <span>Page {page + 1} of {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>Next</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>{t('common.prev')}</button>
+            <span>{t('common.page', { current: page + 1, total: totalPages })}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>{t('common.next')}</button>
           </div>
         </>
       )}
