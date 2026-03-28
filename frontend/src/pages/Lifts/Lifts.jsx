@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { QRCodeCanvas } from 'qrcode.react';
 import { api } from '../../api/client';
 import '../shared.css';
 
@@ -21,6 +23,7 @@ const EMPTY_FORM = {
 };
 
 export default function Lifts() {
+  const { t } = useTranslation();
   const [lifts, setLifts] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -32,6 +35,21 @@ export default function Lifts() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const [orgs, setOrgs] = useState({ SERVICE: [], MANUFACTURER: [], MANAGEMENT: [] });
+  const [qrLift, setQrLift] = useState(null);
+  const qrRef = useRef(null);
+
+  const downloadQR = useCallback(() => {
+    if (!qrRef.current || !qrLift) return;
+    const canvas = qrRef.current.querySelector('canvas');
+    if (!canvas) return;
+    const url = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `qr-${qrLift.serialNumber}.png`;
+    link.href = url;
+    link.click();
+  }, [qrLift]);
 
   const fetchLifts = async (p = page) => {
     setLoading(true);
@@ -47,12 +65,28 @@ export default function Lifts() {
     }
   };
 
+  const fetchOrgs = async () => {
+    try {
+      const data = await api.get('/organizations?size=100');
+      const grouped = { SERVICE: [], MANUFACTURER: [], MANAGEMENT: [] };
+      for (const org of data.content) {
+        if (grouped[org.type]) {
+          grouped[org.type].push(org);
+        }
+      }
+      setOrgs(grouped);
+    } catch (err) {
+      console.error('Failed to load organizations', err);
+    }
+  };
+
   useEffect(() => { fetchLifts(); }, [page]);
 
   const openCreate = () => {
     setEditId(null);
     setForm(EMPTY_FORM);
     setFormError('');
+    fetchOrgs();
     setShowModal(true);
   };
 
@@ -67,6 +101,7 @@ export default function Lifts() {
       managementOrganizationId: lift.managementOrganization?.id || '',
     });
     setFormError('');
+    fetchOrgs();
     setShowModal(true);
   };
 
@@ -100,7 +135,7 @@ export default function Lifts() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this lift?')) return;
+    if (!confirm(t('lifts.confirmDelete'))) return;
     try {
       await api.delete(`/lifts/${id}`);
       fetchLifts();
@@ -113,30 +148,42 @@ export default function Lifts() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const renderOrgSelect = (name, type) => (
+    <label>
+      {t(`lifts.${name === 'serviceOrganizationId' ? 'serviceOrgId' : name === 'manufacturerOrganizationId' ? 'manufacturerOrgId' : 'managementOrgId'}`)}
+      <select name={name} value={form[name]} onChange={handleChange}>
+        <option value="">— {t('common.noData')} —</option>
+        {orgs[type].map((org) => (
+          <option key={org.id} value={org.id}>{org.name}</option>
+        ))}
+      </select>
+    </label>
+  );
+
   return (
     <div>
       <div className="page-header">
-        <h2>Lifts</h2>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add Lift</button>
+        <h2>{t('lifts.title')}</h2>
+        <button className="btn btn-primary" onClick={openCreate}>{t('lifts.add')}</button>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : lifts.length === 0 ? (
-        <div className="empty-state">No lifts found</div>
+        <div className="empty-state">{t('lifts.empty')}</div>
       ) : (
         <>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Serial Number</th>
-                <th>Model</th>
-                <th>Manufacturer</th>
-                <th>Status</th>
-                <th>Service Org</th>
-                <th>Actions</th>
+                <th>{t('lifts.serialNumber')}</th>
+                <th>{t('lifts.model')}</th>
+                <th>{t('lifts.manufacturer')}</th>
+                <th>{t('lifts.status')}</th>
+                <th>{t('lifts.serviceOrg')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -147,13 +194,14 @@ export default function Lifts() {
                   <td>{lift.manufacturer || '—'}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGES[lift.status] || 'badge-gray'}`}>
-                      {lift.status}
+                      {t(`liftStatuses.${lift.status}`)}
                     </span>
                   </td>
                   <td>{lift.serviceOrganization?.name || '—'}</td>
                   <td className="actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(lift)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(lift.id)}>Delete</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => setQrLift(lift)} title="QR">QR</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(lift)}>{t('common.edit')}</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(lift.id)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -161,47 +209,56 @@ export default function Lifts() {
           </table>
 
           <div className="pagination">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
-            <span>Page {page + 1} of {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>Next</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>{t('common.prev')}</button>
+            <span>{t('common.page', { current: page + 1, total: totalPages })}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>{t('common.next')}</button>
           </div>
         </>
+      )}
+
+      {qrLift && (
+        <div className="modal-overlay" onClick={() => setQrLift(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
+            <h3>QR — {qrLift.serialNumber}</h3>
+            <div ref={qrRef} style={{ margin: '20px 0' }}>
+              <QRCodeCanvas value={qrLift.serialNumber} size={256} level="H" includeMargin />
+            </div>
+            <p style={{ fontSize: '13px', color: '#666', marginBottom: '16px' }}>
+              {qrLift.model} {qrLift.manufacturer ? `(${qrLift.manufacturer})` : ''}
+            </p>
+            <div className="modal-actions" style={{ justifyContent: 'center' }}>
+              <button className="btn btn-primary" onClick={downloadQR}>{t('qr.download')}</button>
+              <button className="btn btn-secondary" onClick={() => setQrLift(null)}>{t('common.cancel')}</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editId ? 'Edit Lift' : 'New Lift'}</h3>
+            <h3>{editId ? t('lifts.editTitle') : t('lifts.new')}</h3>
             {formError && <div className="error-msg">{formError}</div>}
             <form onSubmit={handleSave}>
               <label>
-                Serial Number *
+                {t('lifts.serialNumber')} *
                 <input name="serialNumber" value={form.serialNumber} onChange={handleChange} required />
               </label>
               <label>
-                Model *
+                {t('lifts.model')} *
                 <input name="model" value={form.model} onChange={handleChange} required />
               </label>
               <label>
-                Manufacturer
+                {t('lifts.manufacturer')}
                 <input name="manufacturer" value={form.manufacturer} onChange={handleChange} />
               </label>
-              <label>
-                Service Organization ID
-                <input name="serviceOrganizationId" type="number" value={form.serviceOrganizationId} onChange={handleChange} />
-              </label>
-              <label>
-                Manufacturer Organization ID
-                <input name="manufacturerOrganizationId" type="number" value={form.manufacturerOrganizationId} onChange={handleChange} />
-              </label>
-              <label>
-                Management Organization ID
-                <input name="managementOrganizationId" type="number" value={form.managementOrganizationId} onChange={handleChange} />
-              </label>
+              {renderOrgSelect('serviceOrganizationId', 'SERVICE')}
+              {renderOrgSelect('manufacturerOrganizationId', 'MANUFACTURER')}
+              {renderOrgSelect('managementOrganizationId', 'MANAGEMENT')}
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
               </div>
             </form>

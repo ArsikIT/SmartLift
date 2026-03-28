@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import '../shared.css';
 
-const ORG_TYPES = ['MANUFACTURER', 'SERVICE', 'MANAGEMENT'];
+const ORG_TYPE_KEYS = ['MANUFACTURER', 'SERVICE', 'MANAGEMENT'];
 
 const TYPE_BADGES = {
   MANUFACTURER: 'badge-purple',
@@ -11,6 +12,7 @@ const TYPE_BADGES = {
 };
 
 export default function Organizations() {
+  const { t } = useTranslation();
   const [org, setOrg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -82,27 +84,27 @@ export default function Organizations() {
   return (
     <div>
       <div className="page-header">
-        <h2>My Organization</h2>
-        {org && <button className="btn btn-primary" onClick={openEdit}>Edit</button>}
+        <h2>{t('organizations.title')}</h2>
+        {org && <button className="btn btn-primary" onClick={openEdit}>{t('common.edit')}</button>}
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : !org ? (
-        <div className="empty-state">No organization found</div>
+        <div className="empty-state">{t('organizations.empty')}</div>
       ) : (
         <div style={{ background: '#fff', borderRadius: '8px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <tbody>
               {[
-                ['Name', org.name],
-                ['Type', <span className={`badge ${TYPE_BADGES[org.type] || 'badge-gray'}`}>{org.type}</span>],
-                ['Address', org.address || '—'],
-                ['Email', org.contactEmail || '—'],
-                ['Phone', org.contactPhone || '—'],
-                ['Created', new Date(org.createdAt).toLocaleString()],
+                [t('organizations.name'), org.name],
+                [t('organizations.type'), <span className={`badge ${TYPE_BADGES[org.type] || 'badge-gray'}`}>{t(`orgTypes.${org.type}`)}</span>],
+                [t('organizations.address'), org.address || '—'],
+                [t('organizations.contactEmail'), org.contactEmail || '—'],
+                [t('organizations.contactPhone'), org.contactPhone || '—'],
+                [t('organizations.created'), new Date(org.createdAt).toLocaleString()],
               ].map(([label, value], i) => (
                 <tr key={i}>
                   <td style={{ padding: '10px 16px', fontWeight: 600, color: '#555', width: '150px', borderBottom: '1px solid #f0f0f0' }}>{label}</td>
@@ -117,37 +119,37 @@ export default function Organizations() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Edit Organization</h3>
+            <h3>{t('organizations.editTitle')}</h3>
             {formError && <div className="error-msg">{formError}</div>}
             <form onSubmit={handleSave}>
               <label>
-                Name *
+                {t('organizations.name')} *
                 <input name="name" value={form.name} onChange={handleChange} required />
               </label>
               <label>
-                Type *
+                {t('organizations.type')} *
                 <select name="type" value={form.type} onChange={handleChange}>
-                  {ORG_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {ORG_TYPE_KEYS.map((key) => (
+                    <option key={key} value={key}>{t(`orgTypes.${key}`)}</option>
                   ))}
                 </select>
               </label>
               <label>
-                Address
+                {t('organizations.address')}
                 <input name="address" value={form.address} onChange={handleChange} />
               </label>
               <label>
-                Contact Email
+                {t('organizations.contactEmail')}
                 <input name="contactEmail" type="email" value={form.contactEmail} onChange={handleChange} />
               </label>
               <label>
-                Contact Phone
+                {t('organizations.contactPhone')}
                 <input name="contactPhone" value={form.contactPhone} onChange={handleChange} />
               </label>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
               </div>
             </form>

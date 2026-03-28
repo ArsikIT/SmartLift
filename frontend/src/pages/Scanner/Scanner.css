@@ -1,0 +1,35 @@
+.scanner-container {
+  max-width: 500px;
+}
+
+.scanner-start {
+  background: #fff;
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.scanner-start p {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 15px;
+}
+
+.qr-reader {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lift-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.lift-card h3 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  color: #1a1a2e;
+}

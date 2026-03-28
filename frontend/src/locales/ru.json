@@ -1,0 +1,168 @@
+{
+  "app": {
+    "name": "SmartLift"
+  },
+  "nav": {
+    "dashboard": "Главная",
+    "lifts": "Лифты",
+    "maintenances": "Заявки",
+    "events": "События",
+    "users": "Пользователи",
+    "organizations": "Организации",
+    "notifications": "Уведомления",
+    "scanner": "QR Сканер"
+  },
+  "auth": {
+    "login": "Войти",
+    "loginTitle": "Вход",
+    "register": "Создать аккаунт",
+    "registerTitle": "Регистрация",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "email": "Электронная почта",
+    "orgName": "Название организации",
+    "orgType": "Тип организации",
+    "signingIn": "Вход...",
+    "creatingAccount": "Создание аккаунта...",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "logout": "Выйти"
+  },
+  "dashboard": {
+    "title": "Главная",
+    "welcome": "Добро пожаловать, {{username}}!"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "create": "Создать",
+    "actions": "Действия",
+    "confirm_delete": "Вы уверены, что хотите удалить?",
+    "prev": "Назад",
+    "next": "Далее",
+    "page": "Страница {{current}} из {{total}}",
+    "noData": "Данные не найдены",
+    "markRead": "Прочитано",
+    "markAllRead": "Отметить все как прочитанные"
+  },
+  "lifts": {
+    "title": "Лифты",
+    "add": "+ Добавить лифт",
+    "new": "Новый лифт",
+    "editTitle": "Редактирование лифта",
+    "serialNumber": "Серийный номер",
+    "model": "Модель",
+    "manufacturer": "Производитель",
+    "status": "Статус",
+    "serviceOrg": "Сервисная орг.",
+    "serviceOrgId": "ID сервисной организации",
+    "manufacturerOrgId": "ID организации-производителя",
+    "managementOrgId": "ID управляющей организации",
+    "empty": "Лифты не найдены",
+    "confirmDelete": "Удалить этот лифт?"
+  },
+  "maintenances": {
+    "title": "Заявки",
+    "add": "+ Новая заявка",
+    "new": "Новая заявка",
+    "editTitle": "Редактирование заявки",
+    "liftId": "ID лифта",
+    "titleField": "Заголовок",
+    "description": "Описание",
+    "status": "Статус",
+    "technician": "Техник",
+    "technicianId": "ID назначенного техника",
+    "requestedBy": "Заявитель",
+    "requestedById": "ID заявителя",
+    "requested": "Дата заявки",
+    "lift": "Лифт",
+    "empty": "Заявки не найдены",
+    "confirmDelete": "Удалить эту заявку?"
+  },
+  "events": {
+    "title": "События лифтов",
+    "add": "+ Добавить событие",
+    "new": "Новое событие",
+    "editTitle": "Редактирование события",
+    "liftId": "ID лифта",
+    "lift": "Лифт",
+    "type": "Тип",
+    "description": "Описание",
+    "performedBy": "Исполнитель",
+    "performedById": "ID исполнителя",
+    "date": "Дата",
+    "empty": "События не найдены",
+    "confirmDelete": "Удалить это событие?"
+  },
+  "users": {
+    "title": "Пользователи",
+    "add": "+ Добавить пользователя",
+    "new": "Новый пользователь",
+    "editTitle": "Редактирование пользователя",
+    "username": "Имя пользователя",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "passwordHint": "(оставьте пустым, чтобы не менять)",
+    "organization": "Организация",
+    "roles": "Роли",
+    "status": "Статус",
+    "enabled": "Активен",
+    "active": "Активен",
+    "disabled": "Отключён",
+    "empty": "Пользователи не найдены",
+    "confirmDelete": "Удалить этого пользователя?"
+  },
+  "organizations": {
+    "title": "Моя организация",
+    "editTitle": "Редактирование организации",
+    "name": "Название",
+    "type": "Тип",
+    "address": "Адрес",
+    "contactEmail": "Контактный email",
+    "contactPhone": "Контактный телефон",
+    "created": "Создана",
+    "empty": "Организация не найдена"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "empty": "Нет уведомлений"
+  },
+  "orgTypes": {
+    "MANUFACTURER": "Производитель",
+    "SERVICE": "Сервисная компания",
+    "MANAGEMENT": "Управляющая компания"
+  },
+  "liftStatuses": {
+    "CREATED": "Создан",
+    "INSTALLED": "Установлен",
+    "ACTIVE": "Активен",
+    "FAULTY": "Неисправен",
+    "IN_REPAIR": "В ремонте",
+    "DECOMMISSIONED": "Выведен из эксплуатации"
+  },
+  "maintenanceStatuses": {
+    "PENDING": "Ожидает",
+    "IN_PROGRESS": "В работе",
+    "DONE": "Завершена"
+  },
+  "eventTypes": {
+    "CREATED": "Создание",
+    "INSTALLED": "Установка",
+    "ACTIVATED": "Активация",
+    "FAULT": "Неисправность",
+    "REPAIR": "Ремонт",
+    "DECOMMISSIONED": "Списание"
+  },
+  "qr": {
+    "download": "Скачать PNG",
+    "scanTitle": "QR Сканер",
+    "scanHint": "Наведите камеру на QR-код лифта, чтобы увидеть его данные",
+    "startScan": "Начать сканирование",
+    "scanAgain": "Сканировать снова",
+    "cameraError": "Не удалось получить доступ к камере. Разрешите доступ к камере."
+  }
+}

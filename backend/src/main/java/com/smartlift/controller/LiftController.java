@@ -42,6 +42,12 @@ public class LiftController {
         return ResponseEntity.ok(liftService.getLiftById(principal.getName(), id));
     }
 
+    @GetMapping("/serial/{serialNumber}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANUFACTURER', 'SERVICE', 'MANAGEMENT')")
+    public ResponseEntity<LiftResponse> getLiftBySerialNumber(Principal principal, @PathVariable String serialNumber) {
+        return ResponseEntity.ok(liftService.getLiftBySerialNumber(principal.getName(), serialNumber));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANUFACTURER')")
     public ResponseEntity<LiftResponse> createLift(Principal principal, @Valid @RequestBody LiftRequest request) {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import '../shared.css';
 
@@ -21,6 +22,7 @@ const EMPTY_FORM = {
 };
 
 export default function Events() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -96,7 +98,7 @@ export default function Events() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this event?')) return;
+    if (!confirm(t('events.confirmDelete'))) return;
     try {
       await api.delete(`/events/${id}`);
       fetchData();
@@ -114,27 +116,27 @@ export default function Events() {
   return (
     <div>
       <div className="page-header">
-        <h2>Lift Events</h2>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add Event</button>
+        <h2>{t('events.title')}</h2>
+        <button className="btn btn-primary" onClick={openCreate}>{t('events.add')}</button>
       </div>
 
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t('common.loading')}</p>
       ) : items.length === 0 ? (
-        <div className="empty-state">No events found</div>
+        <div className="empty-state">{t('events.empty')}</div>
       ) : (
         <>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Lift</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Performed By</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>{t('events.lift')}</th>
+                <th>{t('events.type')}</th>
+                <th>{t('events.description')}</th>
+                <th>{t('events.performedBy')}</th>
+                <th>{t('events.date')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -143,7 +145,7 @@ export default function Events() {
                   <td>{ev.liftSerialNumber}</td>
                   <td>
                     <span className={`badge ${TYPE_BADGES[ev.type] || 'badge-gray'}`}>
-                      {ev.type}
+                      {t(`eventTypes.${ev.type}`)}
                     </span>
                   </td>
                   <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -152,8 +154,8 @@ export default function Events() {
                   <td>{ev.performedBy?.username || '—'}</td>
                   <td>{formatDate(ev.eventAt)}</td>
                   <td className="actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(ev)}>Edit</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(ev.id)}>Delete</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(ev)}>{t('common.edit')}</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(ev.id)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -161,9 +163,9 @@ export default function Events() {
           </table>
 
           <div className="pagination">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)}>Prev</button>
-            <span>Page {page + 1} of {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>Next</button>
+            <button disabled={page === 0} onClick={() => setPage(page - 1)}>{t('common.prev')}</button>
+            <span>{t('common.page', { current: page + 1, total: totalPages })}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>{t('common.next')}</button>
           </div>
         </>
       )}
@@ -171,33 +173,33 @@ export default function Events() {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>{editId ? 'Edit Event' : 'New Event'}</h3>
+            <h3>{editId ? t('events.editTitle') : t('events.new')}</h3>
             {formError && <div className="error-msg">{formError}</div>}
             <form onSubmit={handleSave}>
               <label>
-                Lift ID *
+                {t('events.liftId')} *
                 <input name="liftId" type="number" value={form.liftId} onChange={handleChange} required />
               </label>
               <label>
-                Type *
+                {t('events.type')} *
                 <select name="type" value={form.type} onChange={handleChange}>
-                  {EVENT_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {EVENT_TYPES.map((et) => (
+                    <option key={et} value={et}>{t(`eventTypes.${et}`)}</option>
                   ))}
                 </select>
               </label>
               <label>
-                Description *
+                {t('events.description')} *
                 <textarea name="description" value={form.description} onChange={handleChange} required maxLength={500} />
               </label>
               <label>
-                Performed By User ID
+                {t('events.performedById')}
                 <input name="performedByUserId" type="number" value={form.performedByUserId} onChange={handleChange} />
               </label>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('common.saving') : t('common.save')}
                 </button>
               </div>
             </form>

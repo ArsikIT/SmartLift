@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { login } from '../../api/auth';
 import { useAuth } from '../../context/AuthContext';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 import './Login.css';
 
 export default function Login() {
@@ -11,6 +13,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { saveAuth } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,13 +34,16 @@ export default function Login() {
   return (
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h1>SmartLift</h1>
-        <h2>Login</h2>
+        <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+          <LanguageSwitcher />
+        </div>
+        <h1>{t('app.name')}</h1>
+        <h2>{t('auth.loginTitle')}</h2>
 
         {error && <div className="auth-error">{error}</div>}
 
         <label>
-          Username
+          {t('auth.username')}
           <input
             type="text"
             value={username}
@@ -48,7 +54,7 @@ export default function Login() {
         </label>
 
         <label>
-          Password
+          {t('auth.password')}
           <input
             type="password"
             value={password}
@@ -58,11 +64,11 @@ export default function Login() {
         </label>
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign in'}
+          {loading ? t('auth.signingIn') : t('auth.login')}
         </button>
 
         <p className="auth-link">
-          Don't have an account? <Link to="/register">Register</Link>
+          {t('auth.noAccount')} <Link to="/register">{t('auth.registerTitle')}</Link>
         </p>
       </form>
     </div>
