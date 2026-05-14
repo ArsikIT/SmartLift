@@ -1,14 +1,18 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import { hasAnyRole, hasRole } from '../../auth/permissions';
 import NotificationBell from '../NotificationBell';
 import LanguageSwitcher from '../LanguageSwitcher';
 import './Layout.css';
 
 export default function Layout() {
-  const { username, logout } = useAuth();
+  const auth = useAuth();
+  const { username, logout } = auth;
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const canManageUsers = hasRole(auth, 'ADMIN');
+  const canManageOrganization = hasRole(auth, 'ADMIN');
 
   const handleLogout = () => {
     logout();
@@ -22,10 +26,14 @@ export default function Layout() {
         <nav className="sidebar-nav">
           <NavLink to="/" end>{t('nav.dashboard')}</NavLink>
           <NavLink to="/lifts">{t('nav.lifts')}</NavLink>
-          <NavLink to="/maintenances">{t('nav.maintenances')}</NavLink>
-          <NavLink to="/events">{t('nav.events')}</NavLink>
-          <NavLink to="/users">{t('nav.users')}</NavLink>
-          <NavLink to="/organizations">{t('nav.organizations')}</NavLink>
+          {hasAnyRole(auth, ['ADMIN', 'SERVICE', 'MANAGEMENT']) && (
+            <NavLink to="/maintenances">{t('nav.maintenances')}</NavLink>
+          )}
+          {hasAnyRole(auth, ['ADMIN', 'SERVICE', 'MANUFACTURER']) && (
+            <NavLink to="/events">{t('nav.events')}</NavLink>
+          )}
+          {canManageUsers && <NavLink to="/users">{t('nav.users')}</NavLink>}
+          {canManageOrganization && <NavLink to="/organizations">{t('nav.organizations')}</NavLink>}
           <NavLink to="/notifications">{t('nav.notifications')}</NavLink>
           <NavLink to="/scan">{t('nav.scanner')}</NavLink>
         </nav>

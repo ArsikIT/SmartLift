@@ -38,7 +38,9 @@ export default function Users() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [page]);
+  useEffect(() => {
+    fetchData();
+  }, [page]);
 
   const openCreate = () => {
     setEditId(null);
@@ -47,13 +49,13 @@ export default function Users() {
     setShowModal(true);
   };
 
-  const openEdit = (u) => {
-    setEditId(u.id);
+  const openEdit = (user) => {
+    setEditId(user.id);
     setForm({
-      username: u.username,
-      email: u.email,
+      username: user.username,
+      email: user.email,
       password: '',
-      enabled: u.enabled,
+      enabled: user.enabled,
     });
     setFormError('');
     setShowModal(true);
@@ -128,20 +130,20 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {items.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.username}</td>
-                  <td>{u.email}</td>
-                  <td>{u.organization?.name || '—'}</td>
-                  <td>{u.roles ? [...u.roles].join(', ') : '—'}</td>
+              {items.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.organization?.name || '-'}</td>
+                  <td>{user.roles ? [...user.roles].join(', ') : '-'}</td>
                   <td>
-                    <span className={`badge ${u.enabled ? 'badge-green' : 'badge-red'}`}>
-                      {u.enabled ? t('users.active') : t('users.disabled')}
+                    <span className={`badge ${user.enabled ? 'badge-green' : 'badge-red'}`}>
+                      {user.enabled ? t('users.active') : t('users.disabled')}
                     </span>
                   </td>
                   <td className="actions">
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(u)}>{t('common.edit')}</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>{t('common.delete')}</button>
+                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(user)}>{t('common.edit')}</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user.id)}>{t('common.delete')}</button>
                   </td>
                 </tr>
               ))}
@@ -171,8 +173,8 @@ export default function Users() {
                 <input name="email" type="email" value={form.email} onChange={handleChange} required />
               </label>
               <label>
-                {t('users.password')} {editId ? t('users.passwordHint') : '*'}
-                <input name="password" type="password" value={form.password} onChange={handleChange} minLength={8} {...(!editId && { required: true })} />
+                {t('users.password')} *
+                <input name="password" type="password" value={form.password} onChange={handleChange} minLength={8} required />
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flexDirection: 'row' }}>
                 <input name="enabled" type="checkbox" checked={form.enabled} onChange={handleChange} style={{ width: 'auto', marginTop: 0 }} />

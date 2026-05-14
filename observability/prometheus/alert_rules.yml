@@ -1,0 +1,83 @@
+groups:
+  - name: smartlift.rules
+    rules:
+      - alert: Watchdog
+        expr: vector(1)
+        labels:
+          severity: none
+        annotations:
+          summary: "Watchdog alert"
+          description: "Continuous test alert to verify the Prometheus to Alertmanager pipeline."
+
+      - alert: SmartLiftBackendDown
+        expr: up{job="smartlift-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "SmartLift backend is unavailable"
+          description: "Prometheus has been unable to scrape backend metrics for more than 1 minute."
+
+      - alert: SmartLiftApiAvailabilitySLOBreach
+        expr: |
+          (
+            100 *
+            (
+              sum(rate(http_server_requests_seconds_count{
+                job="smartlift-backend",
+                uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*",
+                status!~"5.."
+              }[5m]))
+              /
+              clamp_min(
+                sum(rate(http_server_requests_seconds_count{
+                  job="smartlift-backend",
+                  uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*"
+                }[5m])),
+                0.0001
+              )
+            )
+          ) < 99.5
+          and
+          sum(rate(http_server_requests_seconds_count{
+            job="smartlift-backend",
+            uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*"
+          }[5m])) > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SmartLift API availability SLO breached"
+          description: "Business API availability dropped below 99.5% over the last 5 minutes."
+
+      - alert: SmartLiftApiLatencySLOBreach
+        expr: |
+          (
+            100 *
+            (
+              sum(rate(http_server_requests_seconds_bucket{
+                job="smartlift-backend",
+                uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*",
+                le="0.5"
+              }[5m]))
+              /
+              clamp_min(
+                sum(rate(http_server_requests_seconds_count{
+                  job="smartlift-backend",
+                  uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*"
+                }[5m])),
+                0.0001
+              )
+            )
+          ) < 95
+          and
+          sum(rate(http_server_requests_seconds_count{
+            job="smartlift-backend",
+            uri=~"/api/auth.*|/api/lifts.*|/api/maintenances.*|/api/events.*"
+          }[5m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SmartLift API latency SLO breached"
+          description: "Fewer than 95% of business API requests completed within 500 ms over the last 5 minutes."

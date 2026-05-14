@@ -7,6 +7,7 @@
 ### Frontend (Node) ###
 **/node_modules/
 frontend/dist/
+**/dist/
 
 ### IntelliJ IDEA ###
 .idea/
@@ -41,3 +42,19 @@ build/
 
 ### Environment ###
 .env
+backend/.env
+
+### Logs and temp artifacts ###
+*.log
+cp.txt
+/git
+
+### Terraform ###
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

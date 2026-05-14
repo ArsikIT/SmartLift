@@ -1,0 +1,18 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: default-receiver
+  group_by: ["alertname", "job", "severity"]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+  routes:
+    - receiver: watchdog-receiver
+      matchers:
+        - alertname="Watchdog"
+
+receivers:
+  - name: default-receiver
+
+  - name: watchdog-receiver

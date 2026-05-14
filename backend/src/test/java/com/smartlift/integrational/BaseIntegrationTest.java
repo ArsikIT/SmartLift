@@ -1,6 +1,7 @@
 package com.smartlift.integrational;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartlift.config.AsyncTestConfig;
 import com.smartlift.dto.request.LoginRequest;
 import com.smartlift.dto.request.RegisterRequest;
 import com.smartlift.dto.response.AuthResponse;
@@ -10,7 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Import(AsyncTestConfig.class)
 public abstract class BaseIntegrationTest {
 
     @Autowired
@@ -33,12 +37,30 @@ public abstract class BaseIntegrationTest {
     protected ObjectMapper objectMapper;
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private RateLimitFilter rateLimitFilter;
 
     @BeforeEach
-    void resetRateLimiter() throws Exception {
+    void resetTestState() throws Exception {
+        resetDatabase();
         clearField("buckets");
         clearField("lastAccess");
+    }
+
+    private void resetDatabase() {
+        jdbcTemplate.execute("""
+                TRUNCATE TABLE notifications, documents, maintenances, lift_events, lifts, user_roles, users, roles, organizations
+                RESTART IDENTITY CASCADE
+                """);
+        jdbcTemplate.update("""
+                INSERT INTO roles (name, created_at, updated_at) VALUES
+                    ('ADMIN', NOW(), NOW()),
+                    ('SERVICE', NOW(), NOW()),
+                    ('MANAGEMENT', NOW(), NOW()),
+                    ('MANUFACTURER', NOW(), NOW())
+                """);
     }
 
     private void clearField(String fieldName) throws Exception {

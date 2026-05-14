@@ -1,0 +1,7 @@
+target
+.idea
+.env
+backend-run.out.log
+backend-run.err.log
+backend-run.all.log
+*.iml

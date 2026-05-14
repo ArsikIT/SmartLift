@@ -53,8 +53,12 @@ class AuthControllerTest {
     @Test
     void login_returns200WithToken() throws Exception {
         AuthResponse authResponse = AuthResponse.builder()
+                .userId(1L)
                 .token("jwt-token")
                 .username("admin")
+                .roles(Set.of("ADMIN", "MANUFACTURER"))
+                .organization(OrganizationSummaryResponse.builder()
+                        .id(1L).name("TestOrg").type(OrganizationType.MANUFACTURER).build())
                 .build();
         when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
 
@@ -66,8 +70,11 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.token").value("jwt-token"))
-                .andExpect(jsonPath("$.username").value("admin"));
+                .andExpect(jsonPath("$.username").value("admin"))
+                .andExpect(jsonPath("$.roles").isArray())
+                .andExpect(jsonPath("$.organization.id").value(1));
     }
 
     @Test
