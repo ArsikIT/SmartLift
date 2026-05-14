@@ -1,5 +1,6 @@
 package com.smartlift.controller;
 
+import com.smartlift.support.TestPasswords;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartlift.dto.request.LoginRequest;
 import com.smartlift.dto.request.RegisterRequest;
@@ -53,28 +54,35 @@ class AuthControllerTest {
     @Test
     void login_returns200WithToken() throws Exception {
         AuthResponse authResponse = AuthResponse.builder()
+                .userId(1L)
                 .token("jwt-token")
                 .username("admin")
+                .roles(Set.of("ADMIN", "MANUFACTURER"))
+                .organization(OrganizationSummaryResponse.builder()
+                        .id(1L).name("TestOrg").type(OrganizationType.MANUFACTURER).build())
                 .build();
         when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
 
         LoginRequest request = new LoginRequest();
         request.setUsername("admin");
-        request.setPassword("password");
+        request.setPassword(TestPasswords.BASIC);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.token").value("jwt-token"))
-                .andExpect(jsonPath("$.username").value("admin"));
+                .andExpect(jsonPath("$.username").value("admin"))
+                .andExpect(jsonPath("$.roles").isArray())
+                .andExpect(jsonPath("$.organization.id").value(1));
     }
 
     @Test
     void login_returns400WhenUsernameBlank() throws Exception {
         LoginRequest request = new LoginRequest();
         request.setUsername("");
-        request.setPassword("password");
+        request.setPassword(TestPasswords.BASIC);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +106,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("admin");
         request.setEmail("admin@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
         request.setOrganizationName("TestOrg");
         request.setOrganizationType("MANUFACTURER");
 
@@ -119,7 +127,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("existing");
         request.setEmail("ex@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
         request.setOrganizationName("Org");
         request.setOrganizationType("SERVICE");
 

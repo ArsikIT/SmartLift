@@ -13,8 +13,8 @@ class OrganizationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getMyOrganization_returnsCurrentUserOrg() throws Exception {
-        String token = registerAndLogin("orgme_admin", "orgme@test.com",
-                "password123", "OrgMeOrg", "MANUFACTURER");
+        TestAccount admin = testAccount("orgme_admin", "orgme@test.com");
+        String token = registerAndLogin(admin, "OrgMeOrg", "MANUFACTURER");
 
         mockMvc.perform(get("/api/organizations/me")
                         .header("Authorization", "Bearer " + token))
@@ -25,8 +25,8 @@ class OrganizationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateMyOrganization_returns200() throws Exception {
-        String token = registerAndLogin("orgupd_admin", "orgupd@test.com",
-                "password123", "OrgUpdOrg", "SERVICE");
+        TestAccount admin = testAccount("orgupd_admin", "orgupd@test.com");
+        String token = registerAndLogin(admin, "OrgUpdOrg", "SERVICE");
 
         OrganizationRequest request = new OrganizationRequest();
         request.setName("OrgUpdOrg");
@@ -47,14 +47,11 @@ class OrganizationControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void nonAdminUser_cannotAccessOrgEndpoints() throws Exception {
-        String adminToken = registerAndLogin("orgrole_admin", "orgrole@test.com",
-                "password123", "OrgRoleOrg", "MANAGEMENT");
+        TestAccount admin = testAccount("orgrole_admin", "orgrole@test.com");
+        String adminToken = registerAndLogin(admin, "OrgRoleOrg", "MANAGEMENT");
 
-        com.smartlift.dto.request.UserRequest userReq = new com.smartlift.dto.request.UserRequest();
-        userReq.setUsername("org_regular_user");
-        userReq.setEmail("orgregular@test.com");
-        userReq.setPassword("password123");
-        userReq.setEnabled(true);
+        TestAccount regularUser = testAccount("org_regular_user", "orgregular@test.com");
+        com.smartlift.dto.request.UserRequest userReq = newUserRequest(regularUser);
 
         mockMvc.perform(
                         org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/users")
@@ -63,7 +60,7 @@ class OrganizationControllerIntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(userReq)))
                 .andExpect(status().isCreated());
 
-        String regularToken = login("org_regular_user", "password123");
+        String regularToken = login(regularUser);
 
         mockMvc.perform(get("/api/organizations/me")
                         .header("Authorization", "Bearer " + regularToken))

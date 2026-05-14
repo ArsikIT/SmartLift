@@ -1,5 +1,6 @@
 package com.smartlift.controller;
 
+import com.smartlift.support.TestPasswords;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartlift.dto.request.UserRequest;
 import com.smartlift.dto.response.OrganizationSummaryResponse;
@@ -111,7 +112,7 @@ class UserControllerTest {
         UserRequest request = new UserRequest();
         request.setUsername("newuser");
         request.setEmail("new@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +144,7 @@ class UserControllerTest {
         UserRequest request = new UserRequest();
         request.setUsername("updated");
         request.setEmail("updated@test.com");
-        request.setPassword("newpass123");
+        request.setPassword(TestPasswords.UPDATED);
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)

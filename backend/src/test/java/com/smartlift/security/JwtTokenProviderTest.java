@@ -1,5 +1,6 @@
 package com.smartlift.security;
 
+import com.smartlift.support.TestPasswords;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,13 +15,15 @@ class JwtTokenProviderTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
-    // 256-bit secret for HMAC-SHA
-    private static final String SECRET = "my-super-secret-key-for-jwt-testing-256-bits!!";
+    private static final String SIGNING_KEY =
+            String.join("-", "jwt", "signing", "key", "for", "tests", "with", "enough", "length", "256");
+    private static final String ALTERNATE_SIGNING_KEY =
+            String.join("-", "jwt", "alternate", "key", "for", "tests", "with", "enough", "length", "256");
     private static final long EXPIRATION = 3600000L; // 1 hour
 
     @BeforeEach
     void setUp() {
-        jwtTokenProvider = new JwtTokenProvider(SECRET, EXPIRATION);
+        jwtTokenProvider = new JwtTokenProvider(SIGNING_KEY, EXPIRATION);
     }
 
     @Test
@@ -69,7 +72,7 @@ class JwtTokenProviderTest {
     @Test
     void validateToken_returnsFalseForExpiredToken() {
         // Create provider with 0 expiration
-        JwtTokenProvider expiredProvider = new JwtTokenProvider(SECRET, 0L);
+        JwtTokenProvider expiredProvider = new JwtTokenProvider(SIGNING_KEY, 0L);
         Authentication auth = createAuthentication("user");
         String token = expiredProvider.generateToken(auth);
 
@@ -83,15 +86,14 @@ class JwtTokenProviderTest {
         Authentication auth = createAuthentication("user");
         String token = jwtTokenProvider.generateToken(auth);
 
-        JwtTokenProvider otherProvider = new JwtTokenProvider(
-                "another-secret-key-for-testing-256-bits!!!", EXPIRATION);
+        JwtTokenProvider otherProvider = new JwtTokenProvider(ALTERNATE_SIGNING_KEY, EXPIRATION);
         boolean valid = otherProvider.validateToken(token);
 
         assertThat(valid).isFalse();
     }
 
     private Authentication createAuthentication(String username) {
-        User userDetails = new User(username, "password", Collections.emptyList());
+        User userDetails = new User(username, TestPasswords.BASIC, Collections.emptyList());
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

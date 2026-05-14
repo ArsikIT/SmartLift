@@ -1,5 +1,6 @@
 package com.smartlift.security;
 
+import com.smartlift.support.TestPasswords;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
@@ -49,7 +50,7 @@ class JwtAuthenticationFilterTest {
         when(jwtTokenProvider.validateToken("valid-token")).thenReturn(true);
         when(jwtTokenProvider.getUsernameFromToken("valid-token")).thenReturn("admin");
 
-        UserDetails userDetails = new User("admin", "pass", Collections.emptyList());
+        UserDetails userDetails = new User("admin", TestPasswords.BASIC, Collections.emptyList());
         when(userDetailsService.loadUserByUsername("admin")).thenReturn(userDetails);
 
         filter.doFilterInternal(request, response, filterChain);

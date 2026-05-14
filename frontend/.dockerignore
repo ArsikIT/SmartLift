@@ -1,0 +1,7 @@
+node_modules
+dist
+.idea
+frontend-run.out.log
+frontend-run.err.log
+frontend-run.all.log
+*.iml

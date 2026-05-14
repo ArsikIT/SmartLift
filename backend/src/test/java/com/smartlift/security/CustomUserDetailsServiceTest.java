@@ -1,5 +1,6 @@
 package com.smartlift.security;
 
+import com.smartlift.support.TestPasswords;
 import com.smartlift.model.Role;
 import com.smartlift.model.User;
 import com.smartlift.model.enums.RoleName;
@@ -37,7 +38,7 @@ class CustomUserDetailsServiceTest {
 
         User user = new User();
         user.setUsername("admin1");
-        user.setPassword("encodedPassword");
+        user.setPassword(TestPasswords.ENCODED);
         user.setEnabled(true);
         user.setRoles(Set.of(adminRole, serviceRole));
 
@@ -46,7 +47,7 @@ class CustomUserDetailsServiceTest {
         UserDetails userDetails = service.loadUserByUsername("admin1");
 
         assertThat(userDetails.getUsername()).isEqualTo("admin1");
-        assertThat(userDetails.getPassword()).isEqualTo("encodedPassword");
+        assertThat(userDetails.getPassword()).isEqualTo(TestPasswords.ENCODED);
         assertThat(userDetails.isEnabled()).isTrue();
         assertThat(userDetails.getAuthorities()).extracting("authority")
                 .containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_SERVICE");
@@ -59,7 +60,7 @@ class CustomUserDetailsServiceTest {
 
         User user = new User();
         user.setUsername("disabled");
-        user.setPassword("pass");
+        user.setPassword(TestPasswords.BASIC);
         user.setEnabled(false);
         user.setRoles(Set.of(role));
 

@@ -15,9 +15,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createLift_returns201() throws Exception {
-        UserResponse admin = registerOrganization("liftcreate_admin", "liftcreate@test.com",
-                "password123", "LiftCreateOrg", "MANUFACTURER");
-        String token = login("liftcreate_admin", "password123");
+        TestAccount account = testAccount("liftcreate_admin", "liftcreate@test.com");
+        UserResponse admin = registerOrganization(account, "LiftCreateOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-001");
@@ -39,9 +39,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAllLifts_returnsLiftsForCurrentOrg() throws Exception {
-        UserResponse admin = registerOrganization("liftlist_admin", "liftlist@test.com",
-                "password123", "LiftListOrg", "MANUFACTURER");
-        String token = login("liftlist_admin", "password123");
+        TestAccount account = testAccount("liftlist_admin", "liftlist@test.com");
+        UserResponse admin = registerOrganization(account, "LiftListOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-LIST-001");
@@ -64,9 +64,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getLiftById_returnsLift() throws Exception {
-        UserResponse admin = registerOrganization("liftget_admin", "liftget@test.com",
-                "password123", "LiftGetOrg", "MANUFACTURER");
-        String token = login("liftget_admin", "password123");
+        TestAccount account = testAccount("liftget_admin", "liftget@test.com");
+        UserResponse admin = registerOrganization(account, "LiftGetOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-GET-001");
@@ -91,9 +91,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateLift_returns200() throws Exception {
-        UserResponse admin = registerOrganization("liftupd_admin", "liftupd@test.com",
-                "password123", "LiftUpdOrg", "MANUFACTURER");
-        String token = login("liftupd_admin", "password123");
+        TestAccount account = testAccount("liftupd_admin", "liftupd@test.com");
+        UserResponse admin = registerOrganization(account, "LiftUpdOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest createReq = new LiftRequest();
         createReq.setSerialNumber("LIFT-UPD-001");
@@ -127,9 +127,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void deleteLift_returns204() throws Exception {
-        UserResponse admin = registerOrganization("liftdel_admin", "liftdel@test.com",
-                "password123", "LiftDelOrg", "MANUFACTURER");
-        String token = login("liftdel_admin", "password123");
+        TestAccount account = testAccount("liftdel_admin", "liftdel@test.com");
+        UserResponse admin = registerOrganization(account, "LiftDelOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-DEL-001");
@@ -153,9 +153,9 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createLift_returns409WhenDuplicateSerialNumber() throws Exception {
-        UserResponse admin = registerOrganization("liftdup_admin", "liftdup@test.com",
-                "password123", "LiftDupOrg", "MANUFACTURER");
-        String token = login("liftdup_admin", "password123");
+        TestAccount account = testAccount("liftdup_admin", "liftdup@test.com");
+        UserResponse admin = registerOrganization(account, "LiftDupOrg", "MANUFACTURER");
+        String token = login(account);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-DUP-001");
@@ -178,15 +178,11 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void serviceRole_cannotCreateLift() throws Exception {
-        String adminToken = registerAndLogin("liftrole_admin", "liftrole@test.com",
-                "password123", "LiftRoleOrg", "SERVICE");
+        TestAccount adminAccount = testAccount("liftrole_admin", "liftrole@test.com");
+        String adminToken = registerAndLogin(adminAccount, "LiftRoleOrg", "SERVICE");
 
-        // Create a non-admin user (SERVICE role only, no ADMIN)
-        com.smartlift.dto.request.UserRequest userReq = new com.smartlift.dto.request.UserRequest();
-        userReq.setUsername("service_only_user");
-        userReq.setEmail("serviceonly@test.com");
-        userReq.setPassword("password123");
-        userReq.setEnabled(true);
+        TestAccount serviceUser = testAccount("service_only_user", "serviceonly@test.com");
+        com.smartlift.dto.request.UserRequest userReq = newUserRequest(serviceUser);
 
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
@@ -194,7 +190,7 @@ class LiftControllerIntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(userReq)))
                 .andExpect(status().isCreated());
 
-        String serviceToken = login("service_only_user", "password123");
+        String serviceToken = login(serviceUser);
 
         LiftRequest request = new LiftRequest();
         request.setSerialNumber("LIFT-NOROLE");

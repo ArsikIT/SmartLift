@@ -1,7 +1,8 @@
 spring:
   datasource:
-    url: jdbc:tc:postgresql:16:///smartlift_test
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:postgresql://localhost:5434/smartlift
+    username: postgres
+    password: ${TEST_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -11,5 +12,5 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: integration-test-secret-key-that-is-at-least-32-chars
+  secret: ${JWT_SECRET}
   expiration: 3600000

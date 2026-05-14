@@ -2,6 +2,7 @@ package com.smartlift.integrational;
 
 import com.smartlift.dto.request.LoginRequest;
 import com.smartlift.dto.request.RegisterRequest;
+import com.smartlift.support.TestRequestFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -13,12 +14,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_createsOrganizationAndUser() throws Exception {
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("authtest_admin");
-        request.setEmail("authtest@test.com");
-        request.setPassword("password123");
-        request.setOrganizationName("AuthTestOrg");
-        request.setOrganizationType("MANUFACTURER");
+        TestAccount account = testAccount("authtest_admin", "authtest@test.com");
+        RegisterRequest request = newRegisterRequest(account, "AuthTestOrg", "MANUFACTURER");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -35,14 +32,11 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_returns409WhenDuplicateUsername() throws Exception {
-        registerOrganization("dup_user", "dup1@test.com", "password123", "DupOrg1", "SERVICE");
+        TestAccount existing = testAccount("dup_user", "dup1@test.com");
+        registerOrganization(existing, "DupOrg1", "SERVICE");
 
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("dup_user");
-        request.setEmail("other@test.com");
-        request.setPassword("password123");
-        request.setOrganizationName("DupOrg2");
-        request.setOrganizationType("SERVICE");
+        RegisterRequest request = TestRequestFactory.registerRequest(
+                existing.username(), "other@test.com", "DupOrg2", "SERVICE");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,14 +46,11 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_returns409WhenDuplicateEmail() throws Exception {
-        registerOrganization("dup_email_user", "dupemail@test.com", "password123", "DupEmailOrg", "MANAGEMENT");
+        TestAccount existing = testAccount("dup_email_user", "dupemail@test.com");
+        registerOrganization(existing, "DupEmailOrg", "MANAGEMENT");
 
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("another_user");
-        request.setEmail("dupemail@test.com");
-        request.setPassword("password123");
-        request.setOrganizationName("AnotherOrg");
-        request.setOrganizationType("MANAGEMENT");
+        RegisterRequest request = TestRequestFactory.registerRequest(
+                "another_user", existing.email(), "AnotherOrg", "MANAGEMENT");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,14 +60,11 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_returns409WhenDuplicateOrganizationName() throws Exception {
-        registerOrganization("org_dup_user", "orgdup@test.com", "password123", "SameOrgName", "MANUFACTURER");
+        TestAccount existing = testAccount("org_dup_user", "orgdup@test.com");
+        registerOrganization(existing, "SameOrgName", "MANUFACTURER");
 
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("org_dup_user2");
-        request.setEmail("orgdup2@test.com");
-        request.setPassword("password123");
-        request.setOrganizationName("SameOrgName");
-        request.setOrganizationType("MANUFACTURER");
+        TestAccount candidate = testAccount("org_dup_user2", "orgdup2@test.com");
+        RegisterRequest request = newRegisterRequest(candidate, "SameOrgName", "MANUFACTURER");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,12 +74,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_returns400WhenInvalidOrgType() throws Exception {
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("badtype_user");
-        request.setEmail("badtype@test.com");
-        request.setPassword("password123");
-        request.setOrganizationName("BadTypeOrg");
-        request.setOrganizationType("INVALID_TYPE");
+        TestAccount account = testAccount("badtype_user", "badtype@test.com");
+        RegisterRequest request = newRegisterRequest(account, "BadTypeOrg", "INVALID_TYPE");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -101,12 +85,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_returns400WhenValidationFails() throws Exception {
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("");
-        request.setEmail("not-an-email");
-        request.setPassword("short");
-        request.setOrganizationName("");
-        request.setOrganizationType("");
+        RegisterRequest request = TestRequestFactory.invalidRegisterRequest(
+                "", "not-an-email", "short", "", "");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,11 +96,9 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void login_returnsTokenForValidCredentials() throws Exception {
-        registerOrganization("login_user", "login@test.com", "password123", "LoginOrg", "SERVICE");
-
-        LoginRequest request = new LoginRequest();
-        request.setUsername("login_user");
-        request.setPassword("password123");
+        TestAccount account = testAccount("login_user", "login@test.com");
+        registerOrganization(account, "LoginOrg", "SERVICE");
+        LoginRequest request = newLoginRequest(account);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,9 +110,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void login_returns401ForInvalidCredentials() throws Exception {
-        LoginRequest request = new LoginRequest();
-        request.setUsername("nonexistent");
-        request.setPassword("wrongpassword");
+        LoginRequest request = TestRequestFactory.invalidLoginRequest("nonexistent");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,8 +127,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void protectedEndpoint_returns200WithValidToken() throws Exception {
-        String token = registerAndLogin("tokentest_user", "tokentest@test.com",
-                "password123", "TokenTestOrg", "MANUFACTURER");
+        TestAccount account = testAccount("tokentest_user", "tokentest@test.com");
+        String token = registerAndLogin(account, "TokenTestOrg", "MANUFACTURER");
 
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + token)

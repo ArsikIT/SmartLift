@@ -13,8 +13,8 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAllUsers_returnsPageOfUsersInSameOrg() throws Exception {
-        String token = registerAndLogin("usrlist_admin", "usrlist@test.com",
-                "password123", "UsrListOrg", "MANUFACTURER");
+        TestAccount admin = testAccount("usrlist_admin", "usrlist@test.com");
+        String token = registerAndLogin(admin, "UsrListOrg", "MANUFACTURER");
 
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + token))
@@ -25,14 +25,11 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void createUser_returns201() throws Exception {
-        String token = registerAndLogin("usrcreate_admin", "usrcreate@test.com",
-                "password123", "UsrCreateOrg", "SERVICE");
+        TestAccount admin = testAccount("usrcreate_admin", "usrcreate@test.com");
+        String token = registerAndLogin(admin, "UsrCreateOrg", "SERVICE");
 
-        UserRequest request = new UserRequest();
-        request.setUsername("new_employee");
-        request.setEmail("employee@test.com");
-        request.setPassword("password123");
-        request.setEnabled(true);
+        TestAccount employee = testAccount("new_employee", "employee@test.com");
+        UserRequest request = newUserRequest(employee);
 
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -46,14 +43,11 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getUserById_returnsUser() throws Exception {
-        String token = registerAndLogin("usrget_admin", "usrget@test.com",
-                "password123", "UsrGetOrg", "MANAGEMENT");
+        TestAccount admin = testAccount("usrget_admin", "usrget@test.com");
+        String token = registerAndLogin(admin, "UsrGetOrg", "MANAGEMENT");
 
-        UserRequest request = new UserRequest();
-        request.setUsername("getme_user");
-        request.setEmail("getme@test.com");
-        request.setPassword("password123");
-        request.setEnabled(true);
+        TestAccount targetUser = testAccount("getme_user", "getme@test.com");
+        UserRequest request = newUserRequest(targetUser);
 
         MvcResult createResult = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -73,14 +67,11 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void updateUser_returns200() throws Exception {
-        String token = registerAndLogin("usrupd_admin", "usrupd@test.com",
-                "password123", "UsrUpdOrg", "MANUFACTURER");
+        TestAccount admin = testAccount("usrupd_admin", "usrupd@test.com");
+        String token = registerAndLogin(admin, "UsrUpdOrg", "MANUFACTURER");
 
-        UserRequest createReq = new UserRequest();
-        createReq.setUsername("upd_target");
-        createReq.setEmail("updtarget@test.com");
-        createReq.setPassword("password123");
-        createReq.setEnabled(true);
+        TestAccount createdUser = testAccount("upd_target", "updtarget@test.com");
+        UserRequest createReq = newUserRequest(createdUser);
 
         MvcResult createResult = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -92,11 +83,8 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
         UserResponse created = objectMapper.readValue(
                 createResult.getResponse().getContentAsString(), UserResponse.class);
 
-        UserRequest updateReq = new UserRequest();
-        updateReq.setUsername("upd_target_renamed");
-        updateReq.setEmail("updrenamed@test.com");
-        updateReq.setPassword("newpassword123");
-        updateReq.setEnabled(true);
+        TestAccount updatedUser = testAccount("upd_target_renamed", "updrenamed@test.com");
+        UserRequest updateReq = newUpdatedUserRequest(updatedUser);
 
         mockMvc.perform(put("/api/users/" + created.getId())
                         .header("Authorization", "Bearer " + token)
@@ -109,14 +97,11 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void deleteUser_returns204() throws Exception {
-        String token = registerAndLogin("usrdel_admin", "usrdel@test.com",
-                "password123", "UsrDelOrg", "SERVICE");
+        TestAccount admin = testAccount("usrdel_admin", "usrdel@test.com");
+        String token = registerAndLogin(admin, "UsrDelOrg", "SERVICE");
 
-        UserRequest request = new UserRequest();
-        request.setUsername("del_target");
-        request.setEmail("deltarget@test.com");
-        request.setPassword("password123");
-        request.setEnabled(true);
+        TestAccount targetUser = testAccount("del_target", "deltarget@test.com");
+        UserRequest request = newUserRequest(targetUser);
 
         MvcResult createResult = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
@@ -139,9 +124,9 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void deleteUser_returns400WhenDeletingSelf() throws Exception {
-        UserResponse admin = registerOrganization("selfdelete_admin", "selfdelete@test.com",
-                "password123", "SelfDelOrg", "MANUFACTURER");
-        String token = login("selfdelete_admin", "password123");
+        TestAccount adminAccount = testAccount("selfdelete_admin", "selfdelete@test.com");
+        UserResponse admin = registerOrganization(adminAccount, "SelfDelOrg", "MANUFACTURER");
+        String token = login(adminAccount);
 
         mockMvc.perform(delete("/api/users/" + admin.getId())
                         .header("Authorization", "Bearer " + token))
@@ -150,14 +135,11 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void nonAdminUser_returns403ForUserEndpoints() throws Exception {
-        String adminToken = registerAndLogin("nonadmin_org_admin", "nonadmin_org@test.com",
-                "password123", "NonAdminOrg", "SERVICE");
+        TestAccount admin = testAccount("nonadmin_org_admin", "nonadmin_org@test.com");
+        String adminToken = registerAndLogin(admin, "NonAdminOrg", "SERVICE");
 
-        UserRequest request = new UserRequest();
-        request.setUsername("regular_user");
-        request.setEmail("regular@test.com");
-        request.setPassword("password123");
-        request.setEnabled(true);
+        TestAccount regularUser = testAccount("regular_user", "regular@test.com");
+        UserRequest request = newUserRequest(regularUser);
 
         mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + adminToken)
@@ -165,7 +147,7 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        String regularToken = login("regular_user", "password123");
+        String regularToken = login(regularUser);
 
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + regularToken))
@@ -174,10 +156,10 @@ class UserControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void orgBoundary_cannotSeeUsersFromOtherOrg() throws Exception {
-        String tokenOrg1 = registerAndLogin("orgbound_admin1", "orgbound1@test.com",
-                "password123", "OrgBound1", "MANUFACTURER");
-        String tokenOrg2 = registerAndLogin("orgbound_admin2", "orgbound2@test.com",
-                "password123", "OrgBound2", "SERVICE");
+        TestAccount org1 = testAccount("orgbound_admin1", "orgbound1@test.com");
+        TestAccount org2 = testAccount("orgbound_admin2", "orgbound2@test.com");
+        String tokenOrg1 = registerAndLogin(org1, "OrgBound1", "MANUFACTURER");
+        String tokenOrg2 = registerAndLogin(org2, "OrgBound2", "SERVICE");
 
         mockMvc.perform(get("/api/users")
                         .header("Authorization", "Bearer " + tokenOrg1))

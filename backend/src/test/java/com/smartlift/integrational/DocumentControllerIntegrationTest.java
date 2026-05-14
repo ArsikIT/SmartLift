@@ -1,5 +1,6 @@
 package com.smartlift.integrational;
 
+import com.smartlift.support.TestPasswords;
 import com.jayway.jsonpath.JsonPath;
 import com.smartlift.dto.request.DocumentRequest;
 import com.smartlift.dto.request.LiftRequest;
@@ -18,8 +19,8 @@ class DocumentControllerIntegrationTest extends BaseIntegrationTest {
 
     private OrgContext setupOrgWithLift(String prefix) throws Exception {
         UserResponse admin = registerOrganization(prefix + "_admin", prefix + "@test.com",
-                "password123", prefix + "Org", "MANUFACTURER");
-        String token = login(prefix + "_admin", "password123");
+                TestPasswords.DEFAULT, prefix + "Org", "MANUFACTURER");
+        String token = login(prefix + "_admin", TestPasswords.DEFAULT);
 
         LiftRequest liftReq = new LiftRequest();
         liftReq.setSerialNumber(prefix + "-SERIAL");

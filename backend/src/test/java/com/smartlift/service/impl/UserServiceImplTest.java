@@ -1,5 +1,6 @@
 package com.smartlift.service.impl;
 
+import com.smartlift.support.TestPasswords;
 import com.smartlift.dto.request.UserRequest;
 import com.smartlift.dto.response.UserResponse;
 import com.smartlift.exception.BadRequestException;
@@ -113,7 +114,7 @@ class UserServiceImplTest {
         svcRole.setName(RoleName.SERVICE);
         when(roleRepository.findByName(RoleName.SERVICE)).thenReturn(Optional.of(svcRole));
 
-        when(passwordEncoder.encode("password123")).thenReturn("encoded");
+        when(passwordEncoder.encode(TestPasswords.DEFAULT)).thenReturn("encoded");
 
         User savedUser = createUserInOrg(5L, "newuser", 10L);
         savedUser.setEmail("new@test.com");
@@ -123,7 +124,7 @@ class UserServiceImplTest {
         UserRequest request = new UserRequest();
         request.setUsername("newuser");
         request.setEmail("new@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
 
         UserResponse result = userService.createUser("admin", request);
 
@@ -142,7 +143,7 @@ class UserServiceImplTest {
         UserRequest request = new UserRequest();
         request.setUsername("taken");
         request.setEmail("new@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
 
         assertThatThrownBy(() -> userService.createUser("admin", request))
                 .isInstanceOf(ConflictException.class)
@@ -162,7 +163,7 @@ class UserServiceImplTest {
         UserRequest request = new UserRequest();
         request.setUsername("newuser");
         request.setEmail("taken@test.com");
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
 
         assertThatThrownBy(() -> userService.createUser("admin", request))
                 .isInstanceOf(ConflictException.class)
@@ -180,13 +181,13 @@ class UserServiceImplTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(target));
         when(userRepository.findByUsername("newname")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("new@test.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("newpass123")).thenReturn("encoded");
+        when(passwordEncoder.encode(TestPasswords.UPDATED)).thenReturn("encoded");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(target);
 
         UserRequest request = new UserRequest();
         request.setUsername("newname");
         request.setEmail("new@test.com");
-        request.setPassword("newpass123");
+        request.setPassword(TestPasswords.UPDATED);
         request.setEnabled(false);
 
         userService.updateUser("admin", 2L, request);

@@ -1,5 +1,6 @@
 package com.smartlift.service.impl;
 
+import com.smartlift.support.TestPasswords;
 import com.smartlift.dto.request.RegisterRequest;
 import com.smartlift.dto.response.UserResponse;
 import com.smartlift.exception.BadRequestException;
@@ -13,6 +14,7 @@ import com.smartlift.model.enums.RoleName;
 import com.smartlift.repository.OrganizationRepository;
 import com.smartlift.repository.RoleRepository;
 import com.smartlift.repository.UserRepository;
+import com.smartlift.support.TestRequestFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,7 +47,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_createsUserAndOrganization() {
-        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "password123", "TestOrg", "MANUFACTURER");
+        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "TestOrg", "MANUFACTURER");
 
         when(userRepository.existsByUsername("admin")).thenReturn(false);
         when(userRepository.existsByEmail("admin@test.com")).thenReturn(false);
@@ -62,7 +64,7 @@ class RegistrationServiceImplTest {
         when(roleRepository.findByName(RoleName.ADMIN)).thenReturn(Optional.of(adminRole));
         when(roleRepository.findByName(RoleName.MANUFACTURER)).thenReturn(Optional.of(mfgRole));
 
-        when(passwordEncoder.encode("password123")).thenReturn("encoded");
+        when(passwordEncoder.encode(TestPasswords.DEFAULT)).thenReturn("encoded");
 
         User savedUser = new User();
         savedUser.setId(1L);
@@ -84,7 +86,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_throwsWhenUsernameExists() {
-        RegisterRequest request = createRegisterRequest("existing", "new@test.com", "password123", "Org", "SERVICE");
+        RegisterRequest request = createRegisterRequest("existing", "new@test.com", "Org", "SERVICE");
 
         when(userRepository.existsByUsername("existing")).thenReturn(true);
 
@@ -95,7 +97,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_throwsWhenEmailExists() {
-        RegisterRequest request = createRegisterRequest("new", "existing@test.com", "password123", "Org", "SERVICE");
+        RegisterRequest request = createRegisterRequest("new", "existing@test.com", "Org", "SERVICE");
 
         when(userRepository.existsByUsername("new")).thenReturn(false);
         when(userRepository.existsByEmail("existing@test.com")).thenReturn(true);
@@ -107,7 +109,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_throwsWhenOrganizationExists() {
-        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "password123", "ExistingOrg", "SERVICE");
+        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "ExistingOrg", "SERVICE");
 
         when(userRepository.existsByUsername("admin")).thenReturn(false);
         when(userRepository.existsByEmail("admin@test.com")).thenReturn(false);
@@ -120,7 +122,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_throwsForInvalidOrganizationType() {
-        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "password123", "Org", "INVALID");
+        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "Org", "INVALID");
 
         when(userRepository.existsByUsername("admin")).thenReturn(false);
         when(userRepository.existsByEmail("admin@test.com")).thenReturn(false);
@@ -133,7 +135,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_throwsWhenRoleNotFound() {
-        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "password123", "Org", "SERVICE");
+        RegisterRequest request = createRegisterRequest("admin", "admin@test.com", "Org", "SERVICE");
 
         when(userRepository.existsByUsername("admin")).thenReturn(false);
         when(userRepository.existsByEmail("admin@test.com")).thenReturn(false);
@@ -154,7 +156,7 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_createsServiceOrganizationWithServiceRole() {
-        RegisterRequest request = createRegisterRequest("svcAdmin", "svc@test.com", "password123", "SvcOrg", "SERVICE");
+        RegisterRequest request = createRegisterRequest("svcAdmin", "svc@test.com", "SvcOrg", "SERVICE");
 
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
@@ -186,15 +188,9 @@ class RegistrationServiceImplTest {
         assertThat(response.getRoles()).containsExactlyInAnyOrder("ADMIN", "SERVICE");
     }
 
-    private RegisterRequest createRegisterRequest(String username, String email, String password,
-                                                   String orgName, String orgType) {
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername(username);
-        request.setEmail(email);
-        request.setPassword(password);
-        request.setOrganizationName(orgName);
-        request.setOrganizationType(orgType);
-        return request;
+    private RegisterRequest createRegisterRequest(String username, String email,
+                                                  String orgName, String orgType) {
+        return TestRequestFactory.registerRequest(username, email, orgName, orgType);
     }
 
     private Role createRole(Long id, RoleName name) {

@@ -1,5 +1,6 @@
 package com.smartlift.integrational;
 
+import com.smartlift.support.TestPasswords;
 import com.jayway.jsonpath.JsonPath;
 import com.smartlift.dto.request.LiftRequest;
 import com.smartlift.dto.request.MaintenanceRequest;
@@ -19,8 +20,8 @@ class MaintenanceControllerIntegrationTest extends BaseIntegrationTest {
 
     private OrgContext setupOrgWithLift(String prefix, String orgType) throws Exception {
         UserResponse admin = registerOrganization(prefix + "_admin", prefix + "@test.com",
-                "password123", prefix + "Org", orgType);
-        String token = login(prefix + "_admin", "password123");
+                TestPasswords.DEFAULT, prefix + "Org", orgType);
+        String token = login(prefix + "_admin", TestPasswords.DEFAULT);
 
         LiftRequest liftReq = new LiftRequest();
         liftReq.setSerialNumber(prefix + "-SERIAL");
@@ -49,7 +50,7 @@ class MaintenanceControllerIntegrationTest extends BaseIntegrationTest {
         UserRequest request = new UserRequest();
         request.setUsername(username);
         request.setEmail(email);
-        request.setPassword("password123");
+        request.setPassword(TestPasswords.DEFAULT);
 
         MvcResult result = mockMvc.perform(post("/api/users")
                         .header("Authorization", "Bearer " + token)
