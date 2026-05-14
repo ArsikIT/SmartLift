@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
+import RoleRoute from './components/RoleRoute';
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
@@ -32,8 +33,22 @@ export default function App() {
             <Route path="lifts" element={<Lifts />} />
             <Route path="maintenances" element={<Maintenances />} />
             <Route path="events" element={<Events />} />
-            <Route path="users" element={<Users />} />
-            <Route path="organizations" element={<Organizations />} />
+            <Route
+              path="users"
+              element={(
+                <RoleRoute allowedRoles={['ADMIN']}>
+                  <Users />
+                </RoleRoute>
+              )}
+            />
+            <Route
+              path="organizations"
+              element={(
+                <RoleRoute allowedRoles={['ADMIN']}>
+                  <Organizations />
+                </RoleRoute>
+              )}
+            />
             <Route path="notifications" element={<Notifications />} />
             <Route path="scan" element={<Scanner />} />
           </Route>

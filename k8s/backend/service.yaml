@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartlift-backend
+  namespace: smartlift
+  labels:
+    app: smartlift-backend
+spec:
+  selector:
+    app: smartlift-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+  type: ClusterIP

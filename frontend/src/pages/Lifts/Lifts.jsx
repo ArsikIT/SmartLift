@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QRCodeCanvas } from 'qrcode.react';
 import { api } from '../../api/client';
+import { hasAnyRole } from '../../auth/permissions';
+import { useAuth } from '../../context/AuthContext';
 import '../shared.css';
 
 const STATUS_BADGES = {
@@ -24,6 +26,8 @@ const EMPTY_FORM = {
 
 export default function Lifts() {
   const { t } = useTranslation();
+  const auth = useAuth();
+  const canManageLifts = hasAnyRole(auth, ['ADMIN', 'MANUFACTURER']);
   const [lifts, setLifts] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -80,9 +84,12 @@ export default function Lifts() {
     }
   };
 
-  useEffect(() => { fetchLifts(); }, [page]);
+  useEffect(() => {
+    fetchLifts();
+  }, [page]);
 
   const openCreate = () => {
+    if (!canManageLifts) return;
     setEditId(null);
     setForm(EMPTY_FORM);
     setFormError('');
@@ -91,6 +98,7 @@ export default function Lifts() {
   };
 
   const openEdit = (lift) => {
+    if (!canManageLifts) return;
     setEditId(lift.id);
     setForm({
       serialNumber: lift.serialNumber,
@@ -135,6 +143,7 @@ export default function Lifts() {
   };
 
   const handleDelete = async (id) => {
+    if (!canManageLifts) return;
     if (!confirm(t('lifts.confirmDelete'))) return;
     try {
       await api.delete(`/lifts/${id}`);
@@ -148,11 +157,11 @@ export default function Lifts() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const renderOrgSelect = (name, type) => (
+  const renderOrgSelect = (name, type, labelKey) => (
     <label>
-      {t(`lifts.${name === 'serviceOrganizationId' ? 'serviceOrgId' : name === 'manufacturerOrganizationId' ? 'manufacturerOrgId' : 'managementOrgId'}`)}
+      {t(labelKey)}
       <select name={name} value={form[name]} onChange={handleChange}>
-        <option value="">— {t('common.noData')} —</option>
+        <option value="">- {t('common.noData')} -</option>
         {orgs[type].map((org) => (
           <option key={org.id} value={org.id}>{org.name}</option>
         ))}
@@ -164,7 +173,9 @@ export default function Lifts() {
     <div>
       <div className="page-header">
         <h2>{t('lifts.title')}</h2>
-        <button className="btn btn-primary" onClick={openCreate}>{t('lifts.add')}</button>
+        {canManageLifts && (
+          <button className="btn btn-primary" onClick={openCreate}>{t('lifts.add')}</button>
+        )}
       </div>
 
       {error && <div className="error-msg">{error}</div>}
@@ -191,17 +202,21 @@ export default function Lifts() {
                 <tr key={lift.id}>
                   <td>{lift.serialNumber}</td>
                   <td>{lift.model}</td>
-                  <td>{lift.manufacturer || '—'}</td>
+                  <td>{lift.manufacturer || '-'}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGES[lift.status] || 'badge-gray'}`}>
                       {t(`liftStatuses.${lift.status}`)}
                     </span>
                   </td>
-                  <td>{lift.serviceOrganization?.name || '—'}</td>
+                  <td>{lift.serviceOrganization?.name || '-'}</td>
                   <td className="actions">
                     <button className="btn btn-secondary btn-sm" onClick={() => setQrLift(lift)} title="QR">QR</button>
-                    <button className="btn btn-secondary btn-sm" onClick={() => openEdit(lift)}>{t('common.edit')}</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(lift.id)}>{t('common.delete')}</button>
+                    {canManageLifts && (
+                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(lift)}>{t('common.edit')}</button>
+                    )}
+                    {canManageLifts && (
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(lift.id)}>{t('common.delete')}</button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -219,7 +234,7 @@ export default function Lifts() {
       {qrLift && (
         <div className="modal-overlay" onClick={() => setQrLift(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
-            <h3>QR — {qrLift.serialNumber}</h3>
+            <h3>QR - {qrLift.serialNumber}</h3>
             <div ref={qrRef} style={{ margin: '20px 0' }}>
               <QRCodeCanvas value={qrLift.serialNumber} size={256} level="H" includeMargin />
             </div>
@@ -252,9 +267,9 @@ export default function Lifts() {
                 {t('lifts.manufacturer')}
                 <input name="manufacturer" value={form.manufacturer} onChange={handleChange} />
               </label>
-              {renderOrgSelect('serviceOrganizationId', 'SERVICE')}
-              {renderOrgSelect('manufacturerOrganizationId', 'MANUFACTURER')}
-              {renderOrgSelect('managementOrganizationId', 'MANAGEMENT')}
+              {renderOrgSelect('serviceOrganizationId', 'SERVICE', 'lifts.serviceOrgId')}
+              {renderOrgSelect('manufacturerOrganizationId', 'MANUFACTURER', 'lifts.manufacturerOrgId')}
+              {renderOrgSelect('managementOrganizationId', 'MANAGEMENT', 'lifts.managementOrgId')}
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>{t('common.cancel')}</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>

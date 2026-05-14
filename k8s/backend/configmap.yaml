@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smartlift-backend-config
+  namespace: smartlift
+data:
+  SPRING_PROFILES_ACTIVE: prod
+  DB_URL: jdbc:postgresql://smartlift-postgres:5432/smartlift
+  DB_USERNAME: postgres
+  JWT_EXPIRATION: "3600000"
+  MAIL_ENABLED: "false"
+  MAIL_FROM: no-reply@smartlift.local

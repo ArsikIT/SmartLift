@@ -1,0 +1,39 @@
+environment             = "dev"
+kubeconfig_path         = "~/.kube/config"
+kube_context            = "docker-desktop"
+app_namespace           = "smartlift"
+observability_namespace = "smartlift-observability"
+ingress_enabled         = true
+ingress_class_name      = "nginx"
+frontend_ingress_host   = "smartlift.local"
+
+backend_image  = "ghcr.io/your-org/smartlift-backend:latest"
+frontend_image = "ghcr.io/your-org/smartlift-frontend:latest"
+db_username    = "postgres"
+db_password    = "change-me"
+jwt_secret     = "change-me"
+postgres_db    = "smartlift"
+postgres_image = "postgres:17-alpine"
+db_url         = ""
+jwt_expiration = "3600000"
+
+mail_enabled  = false
+mail_from     = "no-reply@smartlift.local"
+mail_host     = ""
+mail_port     = "587"
+mail_username = ""
+mail_password = ""
+grafana_admin_user     = "admin"
+grafana_admin_password = "admin"
+
+backend_replicas                      = 2
+backend_min_replicas                  = 2
+backend_max_replicas                  = 6
+backend_hpa_target_cpu_utilization    = 70
+backend_cpu_request                   = "250m"
+backend_cpu_limit                     = "1"
+backend_memory_request                = "512Mi"
+backend_memory_limit                  = "1Gi"
+frontend_replicas                     = 1
+frontend_api_upstream                 = "http://smartlift-backend.smartlift.svc.cluster.local:8080"
+postgres_storage_size                 = "10Gi"

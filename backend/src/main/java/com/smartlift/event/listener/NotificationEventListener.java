@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,7 +26,10 @@ public class NotificationEventListener {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final ObjectProvider<JavaMailSender> mailSenderProvider;
+
+    @Value("${smartlift.mail.enabled:false}")
+    private boolean mailEnabled;
 
     @Value("${smartlift.mail.from}")
     private String mailFrom;
@@ -77,6 +81,20 @@ public class NotificationEventListener {
     }
 
     private void sendEmail(User recipient, String title, String message) {
+        if (!mailEnabled) {
+            return;
+        }
+        if (recipient.getEmail() == null || recipient.getEmail().isBlank()) {
+            log.warn("Skipping email notification for user {} because email is blank", recipient.getId());
+            return;
+        }
+
+        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+        if (mailSender == null) {
+            log.warn("Email delivery is enabled but no JavaMailSender is configured");
+            return;
+        }
+
         try {
             SimpleMailMessage mail = new SimpleMailMessage();
             mail.setFrom(mailFrom);
